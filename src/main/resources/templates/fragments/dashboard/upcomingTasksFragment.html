@@ -1,0 +1,60 @@
+<div th:fragment="upcomingTasksFragment(tasks)">
+  <div th:if="${isAuthenticated}" class="d-flex flex-column gap-2 scrolling-box">
+      <div th:if="${tasks.size > 0}" th:each="task : ${tasks}">
+        <a class="unstyled-link" th:href="@{/renovation/{id}/tasks/{taskId}(id=${task.renovation.id}, taskId=${task.id})}">
+          <div class="renovation-card dashboard-clickable">
+            <div class="card-body">
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
+
+                <!-- Left -->
+                <div class="d-flex flex-column gap-1 align-items-start">
+                  <p class="mb-0 upcoming-task-title" th:text="${task.name}">Task Name</p>
+                  <div class="reno-name d-flex align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                      <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
+                      <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    </svg>
+                    <span th:text="${task.renovation.name}">Renovation Name</span>
+                  </div>
+                </div>
+
+                <!-- Right -->
+                <div class="d-flex flex-row flex-md-column align-items-start align-items-md-end gap-2 ms-0 ms-md-auto">
+                    <span class="badge" th:classappend="${task.state.getBadgeClassName()}" th:text="${task.state.getDisplayName()}"></span>
+                    <span class="badge bg-secondary" th:if="${task.getDueDate() != null}"
+                        th:classappend="${task.getDueDate().isEqual(T(java.time.LocalDate).now())} ? ' bg-danger' : ''"
+                        th:text="${task.getDueDate().isEqual(T(java.time.LocalDate).now()) ? 'Today'
+                         : T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDateWithoutYear(task.getDueDate())}"></span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+<!--      Claude helped create this no task upcoming message-->
+      <div th:if="${tasks.size == 0}" class="text-muted text-center p-4">
+          <div class="d-flex flex-column align-items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                   stroke-linejoin="round" class="mb-3 opacity-50">
+                  <path d="M8 2v4"/>
+                  <path d="M16 2v4"/>
+                  <rect width="18" height="18" x="3" y="4" rx="2"/>
+                  <path d="M3 10h18"/>
+                  <path d="M8 14h.01"/>
+                  <path d="M12 14h.01"/>
+                  <path d="M16 14h.01"/>
+                  <path d="M8 18h.01"/>
+                  <path d="M12 18h.01"/>
+                  <path d="M16 18h.01"/>
+              </svg>
+              <p class="mb-0">You have no upcoming tasks due within the next week</p>
+              <small class="text-muted mt-1">Tasks will appear here when they're due soon</small>
+          </div>
+      </div>
+  </div>
+</div>

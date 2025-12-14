@@ -1,0 +1,226 @@
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark background-primary"
+     th:fragment="navBar(activeLink, extraOffCanvasContent)">
+    <div class="container-fluid d-flex justify-content-between align-items-center gap-2 flex-wrap"
+         style="max-width: 80rem;">
+        <div class="row w-100 align-items-center">
+            <div class="col d-flex justify-content-start">
+                <div class="position-relative">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <!-- Remove d-none when there is a notification -->
+                    <span class="navbar-dot d-none d-md-none d-lg-none" id="navbar-dot"></span>
+                </div>
+                <div class="collapse navbar-collapse justify-content">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" th:classappend="${#strings.equals(activeLink, 'Home')} ? 'active' : ''"
+                               th:href="@{/}">
+                                Home
+                            </a>
+                        </li>
+                        <li th:class="nav-item">
+                            <a class="nav-link"
+                               th:classappend="${#strings.equals(activeLink, 'Browse Renovations')} ? 'active' : ''"
+                               th:href="@{/browse}">
+                                Browse Renovations
+                            </a>
+                        </li>
+                        <li th:class="nav-item" th:if="${isAuthenticated != null and isAuthenticated}">
+                            <a class="nav-link"
+                               th:classappend="${#strings.equals(activeLink, 'My Renovations')} ? 'active' : ''"
+                               th:href="@{/myRenovations}">
+                                My Renovations
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- ChatGPT helped figure out I need a repeat of this, so I can have different colour text when it's in the offcanvas form -->
+                <div class="offcanvas offcanvas-start justify-content-start d-inline d-lg-none"
+                     id="navbarSupportedContent">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <div class="d-flex flex-column">
+                            <!-- Offcanvas Sign In/Register: shown on <lg, hidden on ≥lg -->
+                            <div th:if="${isAuthenticated == null or isAuthenticated != true}"
+                                 class="d-block d-lg-none mt-4 px-3">
+                                <a class="btn btn-primary w-100 mb-2" th:href="@{/login}">Sign In</a>
+                                <a class="btn btn-outline-primary w-100" th:href="@{/register}">Register</a>
+                            </div>
+
+                            <div class="sidebar-content">
+
+                                <div class="sidebar-group">
+                                    <div class="sidebar-group-label">
+                                        Navigation
+                                    </div>
+
+                                    <div class="sidebar-group-content">
+                                        <ul class="sidebar-menu">
+                                            <li class="sidebar-menu-item">
+                                                <a class="sidebar-menu-button"
+                                                   th:classappend="${activeLink == 'Home' ? 'active' : ''}"
+                                                   th:href="@{/}">
+                                                    Home
+                                                </a>
+                                            </li>
+                                            <li class="sidebar-menu-item">
+                                                <a class="sidebar-menu-button"
+                                                   th:classappend="${activeLink == 'Browse Renovations' ? 'active' : ''}"
+                                                   th:href="@{/browse}">
+                                                    Browse Renovations
+                                                </a>
+                                            </li>
+                                            <li th:if="${isAuthenticated != null and isAuthenticated}"
+                                                class="sidebar-menu-item">
+                                                <a class="sidebar-menu-button"
+                                                   th:classappend="${activeLink == 'My Renovations' ? 'active' : ''}"
+                                                   th:href="@{/myRenovations}">
+                                                    My Renovations
+                                                </a>
+                                            </li>
+                                            <li class="sidebar-menu-item">
+                                                <a class="sidebar-menu-button"
+                                                   th:href="@{/browse}">
+                                                    Search
+                                                </a>
+                                            </li>
+                                            <li class="sidebar-menu-item d-block d-md-none"
+                                                th:if="${isAuthenticated != null and isAuthenticated}">
+                                                <button class="sidebar-menu-button align-items-center"
+                                                        data-bs-toggle="offcanvas"
+                                                        data-bs-target="#notificationOffcanvas"
+                                                        aria-controls="notificationsOffcanvas">
+                                                    Notifications <span class="dot d-none" id="sidebar-dot"></span>
+                                                    <!-- Remove d-none when there are notifications -->
+                                                </button>
+
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <th:block th:if="${extraOffCanvasContent != null}">
+                                    <div class="sidebar-separator"></div>
+                                    <div th:insert="${extraOffCanvasContent}"></div>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${isAuthenticated}" class="offcanvas offcanvas-start justify-content-start d-inline d-lg-none px-0"
+                 id="notificationOffcanvas">
+                <div th:insert="~{fragments/smallScreenNotificationTemplate}"></div>
+
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="notificationsMenu">Notifications</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-toggle="offcanvas"
+                            data-bs-target="#navbarSupportedContent"
+                            aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body" id="mobile-notifications-menu">
+                    <!-- when there are new notifications add d-none -->
+                    <div class="d-flex flex-grow-1 justify-content-center align-items-center"
+                         id="no-notifs-message-menu">
+                        <strong>You have no new notifications</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto d-flex justify-content-center">
+                <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
+                    <img alt="Hammer Icon" class="d-inline-block align-top" height="40"
+                         th:src="@{/images/newlogonobackground.svg}">
+                    <span class="ms-2 fs-4 fw-bold text-white d-none d-md-inline">Collabrick</span>
+                </a>
+            </div>
+            <div class="col d-flex justify-content-end">
+                <div class="d-flex align-items-center gap-2">
+                    <a
+                            type="button"
+                            class="search-btn d-none d-sm-block"
+                            th:href="@{/browse}">
+                        <img alt="Search Icon"
+                             class="d-inline-block align-top"
+                             height="35"
+                             th:src="@{/images/searchIcon.png}"
+                             width="35"/>
+                    </a>
+                    <div th:if="${isAuthenticated}" id="notifications-dropdown"  class="dropdown d-none d-sm-block">
+                        <a class="d-flex align-items-center" href="#" role="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <!-- Remove d-none here when there are notifications -->
+                            <img class="d-none" id="bell-with-dot" th:src="@{/images/bellWithDot.svg}" height="25">
+                            <!-- Add d-none here when there are notifications -->
+                            <img class="" id="bell-no-dot" th:src="@{/images/bell.svg}" height="25">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end notifications-dropdown" aria-labelledby="notificationsDropdown">
+                            <div class="d-flex flex-column scroll-box">
+                                <!-- Add d-none here when there are notifications -->
+                                <div class="d-flex flex-grow-1 justify-content-center align-items-center" id="no-notifs-message-dropdown">
+                                    <strong>You have no new notifications</strong>
+                                </div>
+                                <!-- Notification get added here-->
+                                <div class="d-flex flex-column justify-content-center" id="notifs-message-dropdown"></div>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Auth Buttons -->
+                <div class="d-flex align-items-center gap-2 ms-0 ms-sm-1">
+                    <th:block th:switch="${isAuthenticated}">
+                        <div th:case="false">
+                            <div class="collapse navbar-collapse">
+                                <!-- Displays when user is logged out -->
+                                <a class="button button-primary" th:href="@{/login}">Sign In</a>
+                                <a class="button button-white" th:href="@{/register}">Register</a>
+                            </div>
+                        </div>
+                        <div id="profile-dropdown" class="dropdown" th:case="true">
+                            <div th:insert="~{fragments/largeScreenNotificationTemplate}"></div>
+                            <!-- Displays when user is logged in -->
+                            <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                               href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span th:if="${user != null}" class="me-1 d-none d-sm-inline" id="username"
+                              th:text="${user.fname + ' ' + user.lname}"></span>
+                                <img th:if="${user.image != null}"
+                                     th:src="@{${'/'} + ${user.image}}"
+                                     class="rounded-circle" height="40" width="40" alt="User Image"/>
+                                <img th:if="${user.image == null}"
+                                     th:src="@{/images/PlaceholderIcon.png}"
+                                     class="rounded-circle" height="40" width="40" alt="User Image"/>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end text-small" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" th:href="@{/userPage}">My Profile</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="app-data" th:data-base-url="@{/}" style="display:none"></div>
+
+    <th:block th:if="${isAuthenticated}">
+        <script th:src="@{/webjars/stomp__stompjs/7.1.1/bundles/stomp.umd.min.js}"></script>
+        <script type="module" th:src="@{/javascript/chat/socketManager.js}"></script>
+        <script type="module" th:src="@{/javascript/chat/mentionHandler.js}"></script>
+        <script th:inline="javascript">
+            let userId = /*[[${user.id}]]*/ null;
+            const webSocketUrl = /*[[${webSocketUrl}]]*/ "";
+            const baseUrl = /*[[${baseUrl}]]*/ "";
+            const chatMentions = /*[[${chatMentions}]]*/[];
+            window.baseUrl = /*[[${baseUrl}]]*/ false;
+            window.fullBaseUrl = /*[[${fullBaseUrl}]]*/ false;
+        </script>
+    </th:block>
+</nav>

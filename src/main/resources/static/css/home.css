@@ -1,0 +1,142 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 65vh;
+}
+
+.text-box {
+    width: 60%;
+    margin-left: 5%;
+}
+
+.button-box {
+    width: 40%;
+    margin-right: 5%;
+    padding: 5%;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #193CB8FF;
+    border-radius: 15px;
+    min-height: 70%;
+}
+
+.heading-mobile {
+    display: none;
+}
+
+@media (max-width: 1000px) {
+    .container {
+        flex-direction: column;
+        align-items: stretch;
+        height: auto;
+    }
+
+    .text-box, .button-box {
+        width: 90%;
+        margin: 10px auto;
+        text-align: center;
+    }
+
+    .heading-desktop {
+        display: none;
+    }
+
+    .heading-mobile {
+        display: block;
+    }
+
+    .task-badges {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+}
+
+/* ChatGPT did the bounce thing cause its not that serious */
+
+img.bounce-hover {
+    display: inline-block; /* ensures transform works */
+    transition: transform 0.2s ease;
+}
+
+img.bounce-hover:hover {
+    animation: bounce 0.6s;
+}
+
+/* Keyframes for a small bounce */
+@keyframes bounce {
+    0%   { transform: translateY(0); }
+    25%  { transform: translateY(-12px); }
+    50%  { transform: translateY(0); }
+    75%  { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
+}
+
+.homepage-graphic {
+    width: 65%;
+    height: auto;
+}
+
+@media (max-width: 1000px) {
+    .homepage-graphic {
+        width: 100%;
+    }
+}
+
+.task-box h3, .task-box h6 {
+    text-align: center;
+}
+
+@media (min-width: 1200px) {
+    .scrolling-box {
+        max-height: 1150px;
+        overflow-y: auto;
+    }
+}
+
+.unstyled-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.unstyled-link:hover,
+.unstyled-link:focus,
+.unstyled-link:active {
+    text-decoration: none;
+    color: inherit;
+}
+
+.reno-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    word-break: break-word;
+    gap: 0.25rem;
+    color: var(--color-gray);
+}
+
+.reno-name span {
+    font-size: 0.75rem;
+}
+
+.reno-name svg {
+    height: 1rem;
+    width: 1rem;
+}
+
+.upcoming-task-title {
+    word-break: break-word;
+}
+
+.feature-card{
+    border-top: 2px solid #193CB8;
+}
+
+.feature-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}

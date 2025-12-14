@@ -1,0 +1,22 @@
+<th:block th:fragment="head">
+    <link th:href="@{/css/calendar.css}" rel="stylesheet"/>
+</th:block>
+<div th:fragment="content">
+    <div class="flex flex-column w-100">
+        <div class="d-flex flex-column flex-md-row align-content-md-center justify-content-between">
+            <div th:replace="~{fragments/renovation/renovationTitleFragment :: renovationTitle(${renovation.name}, false)}"></div>
+            <div th:replace="~{renovation/fragment/tasksFilterStatesDropdownFragment :: filterTaskStatesDropdown('/renovation/' + ${renovation.id} + '/calendar')}"></div>
+        </div>
+        <div id="calendar" class="w-100" ></div>
+    </div>
+</div>
+<th:block th:fragment="scripts">
+    <script th:inline="javascript">
+        let month = /*[[${month}]]*/ "";
+        let year = /*[[${year}]]*/ "";
+        const states = /*[[${states}]]*/ [];
+    </script>
+    <script th:src="@{/javascript/stateFilter.js}"></script>
+    <script th:src="@{/javascript/ajaxHelper.js}"></script>
+    <script th:src="@{/javascript/tasksCalendarAjax.js}"></script>
+</th:block>

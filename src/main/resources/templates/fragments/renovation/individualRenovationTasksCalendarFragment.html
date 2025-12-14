@@ -1,0 +1,78 @@
+<th:block th:fragment="individualRenovationTasksCalendarFragment">
+    <div class="renovation-card p-2">
+        <div class="calendar-header w-100">
+                <button class="button button-outline-primary month-nav"
+                        th:text="'< ' + ${calendar.previousMonthName()}"
+                        th:attr="data-month=${calendar.previousMonthId()}, data-year=${calendar.previousMonthYear()}"></button>
+
+                <div id="month-year" th:text="${calendar.currentMonthName()} + ', ' + ${calendar.currentYear()}"></div>
+
+                <button class="button button-outline-primary month-nav"
+                        th:text="${calendar.nextMonthName()} + ' >'"
+                        th:attr="data-month=${calendar.nextMonthId()}, data-year=${calendar.nextMonthYear()}"></button>
+            </div>
+    </div>
+    <div class="calendar-body">
+        <div class="calendar-weekdays">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+        </div>
+        <div class="calendar-dates">
+            <th:block th:each="cell : ${calendar.cells()}">
+                <!-- Chatgpt helped form the href link -->
+                <div th:if="${cell != null}"
+                     class="calendar-cell"
+                     th:classappend="
+                          (${cell.cellDate() == highlightedDate} ? ' calendar-cell-highlight' : '123') +
+                         (${cell.isCurrentDay()} ? ' calendar-cell-today' : '') "
+                     th:attr="data-new-tag-url=@{/myRenovations/{id}/newTask(id=${renovation.id},
+                        taskDueDate=${cell.cellDate()})}">
+                    <div class="calendar-item-container">
+                            <span th:id="${cell.isCurrentDay}  ? 'current-date-number' : '' " class="calendar-date-text"
+                                  th:text="${cell.dayOfMonth()}"></span>
+                        <div class="calendar-item-list">
+                            <!-- first 3 items -->
+                            <div th:each="task, iterStat : ${cell.items()}" th:if="${iterStat.index < 3}">
+                                <button class="calendar-item"
+                                        th:classappend="${task.getState().getBadgeClassName()}"
+                                        th:attr="data-day=${cell.dayOfMonth()}, data-bs-target='#taskModal' + ${task.getId()},
+                                    data-edit-task-url=@{/myRenovations/{renovationId}/editTask/{taskId}(renovationId=${renovation.id}, taskId=${task.getId()})}">
+                                    <span th:text="${task.getName()}"></span>
+                                </button>
+                                <div th:replace="~{fragments/renovation/taskInfoModalFragment :: taskInfoModalFragment(task=${task}, modalId='taskModal' + ${task.getId()})}"></div>
+                            </div>
+                            <!-- other items that are toggleable -->
+                            <div th:each="task, iterStat : ${cell.items()}" th:if="${iterStat.index >= 3}">
+                                <button class="calendar-item d-none"
+                                        th:attr="data-day=${cell.dayOfMonth()}, data-bs-target='#taskModal' + ${task.getId()},
+                                    data-edit-task-url=@{/myRenovations/{renovationId}/editTask/{taskId}(renovationId=${renovation.id}, taskId=${task.getId()})}"
+                                        th:classappend="${task.getState().getBadgeClassName()} + ' extra-item-' + ${cell.dayOfMonth()}">
+                                    <span th:text="${task.getName()}"></span>
+                                </button>
+                                <div th:replace="~{fragments/renovation/taskInfoModalFragment :: taskInfoModalFragment(task=${task}, modalId='taskModal' + ${task.getId()})}"></div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="calendar-items-show-more"
+                             th:if="${cell.items().size() > 3}"
+                             th:attr="data-day=${cell.dayOfMonth()}">
+                            <span class="show-more-label"
+                                  th:text="'Show ' + ${cell.items().size() - 3} + ' more task' + ${(cell.items().size() - 3) > 1 ? 's' : ''}">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <a th:if="${cell == null}">
+                    <div class="calendar-cell"></div>
+                </a>
+            </th:block>
+        </div>
+    </div>
+</th:block>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--/*/ <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}"></th:block> /*/-->
+    <title>Sign in</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+</head>
+<body style="padding-top:70px">
+
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 48rem;">
+    <div class="container position-relative">
+        <h3 class="m-0 text-center">Sign in</h3>
+        <form class="renovation-card" method="post" th:action="@{/do_login}" th:object="${user}">
+
+            <input type="hidden" name="redirect" th:value="${redirectUrl}">
+
+            <div class="w-100">
+                <th:block th:with="error=${errors?.getCredentialsError() ?: tokenErrorMessage}">
+                    <div class="pb-2" th:if="${error != null}">
+                        <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${error})}"/>
+                    </div>
+                </th:block>
+                <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'Email address',
+                            true,
+                            'email',
+                            'text',
+                            'Enter email',
+                            'We\'ll never share your email with anyone else.',
+                            ${errors?.emailError ?: errors?.credentialsError},
+                            ${(errors?.emailError) != null}
+                        )}"/>
+
+                <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'Password',
+                            true,
+                            'password',
+                            'password',
+                            'Enter password',
+                            '',
+                            ${errors?.passwordError ?: errors?.credentialsError},
+                            ${(errors?.passwordError) != null}
+                        )}"/>
+                <small class="form-text text-muted"><a th:href="@{/forgotten-password}">Forgot your
+                    password?</a></small>
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <p class="flex-grow-1 m-0 text-start">
+                        Not registered? <a th:href="@{/register}">Create an account</a>
+                    </p>
+                    <div class="d-flex flex-column-reverse flex-md-row gap-2">
+                        <a class="button button-secondary" th:href="@{/}">Cancel</a>
+                        <button class="button button-primary" type="submit">Sign in</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

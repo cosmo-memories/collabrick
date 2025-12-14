@@ -1,0 +1,35 @@
+<!-- See: https://getbootstrap.com/docs/5.3/components/card/ -->
+<div th:fragment="featureCardFragment">
+    <div class="row g-4">
+        <div class="col-lg-4 col-12">
+            <div class="card h-100 feature-card">
+                <img th:src="@{/images/ChatChannelSS4.png}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Chat and plan with team members</h5>
+                    <p class="card-text">Collabrick promotes collaboration. With live chat, you can quickly resolve small details with your team. Plus, our integrated chatbot provides fast answers to help you stay on track.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-12 ">
+            <div class="card h-100 feature-card">
+                <img th:src="@{/images/CalenderSS1.png}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Colour in your calendar</h5>
+                    <p class="card-text">Easily track upcoming task deadlines and plan ahead.
+                        Quickly see task statuses, whether pending,
+                        in progress, or completed so you can stay organized and on schedule.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-12">
+            <div class="card h-100 feature-card">
+                <img th:src="@{/images/Dashboard1.png}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Stay on top of it</h5>
+                    <p class="card-text">Receive live updates on your renovations. Collabrick gives you easy access to all your projects,
+                        sends reminders for upcoming task deadlines, and provides an activity feed to see when team members make changes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

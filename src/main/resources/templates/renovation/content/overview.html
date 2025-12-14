@@ -1,0 +1,134 @@
+<th:block th:fragment="head">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</th:block>
+<th:block th:fragment="content">
+    <div class="flex flex-column w-100">
+        <div th:replace="~{fragments/renovation/renovationTitleFragment :: renovationTitle(${renovation.name}, ${isOwner})}"></div>
+        <div class="d-flex justify-content-between">
+            <div>
+                <div th:if="${renovation.location.city != ''}" class="d-flex justify-content-start align-items-md-center mb-2 flex-wrap">
+                    <img alt="Location Icon"
+                         height="30"
+                         width="30"
+                         th:src="@{'/images/locationPin.svg'}" style="margin-right: 5px">
+                        <span th:if="${renovation.location.streetAddress != ''}"
+                              th:text="${renovation.location.streetAddress}">Not Found</span>
+                        <span th:if="${renovation.location.streetAddress != ''}">, &nbsp</span>
+                        <span th:if="${renovation.location.suburb != ''}"
+                              th:text="${renovation.location.suburb}">Not Found</span>
+                        <span th:if="${renovation.location.suburb != ''}">, &nbsp</span>
+                        <span th:if="${renovation.location.postcode != ''}"
+                              th:text="${ renovation.location.city + ' ' + renovation.location.postcode}">Not Found</span>
+                        <span th:if="${renovation.location.postcode != ''}">, &nbsp</span>
+                        <span th:if="${renovation.location.country != ''}"
+                              th:text="${renovation.location.country}">Not Found</span>
+                </div>
+                <div class="d-flex justify-content-start align-items-center mb-2">
+                    <img alt="Calendar Icon"
+                         height="28"
+                         width="28"
+                         th:src="@{'/images/calendarIcon.svg'}" style="margin-right: 8px">
+                    <span class="my-auto text-break"
+                          th:text="${'Created on ' + T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(renovation.createdTimestamp)}"></span>
+                </div>
+            </div>
+        </div>
+        <div th:if="${renovation.description != null and renovation.description != ''}"  class="d-flex p-0">
+            <div class="renovation-card w-100 mt-2">
+                <span class="text-break" th:text="${renovation.description}"></span>
+            </div>
+        </div>
+        <div class="mt-2 d-flex gap-4 flex-column flex-md-row">
+            <div class="renovation-card w-100">
+                <div class="vstack gap-1">
+                    <h6>Rooms:</h6>
+                    <div>
+                        <span class="room-badge" th:each="room : ${renovation.rooms}"><span
+                                th:text="${room.name}">Room Name</span></span>
+                        <span th:if="${renovation.rooms.empty}">
+                            <i>No rooms for this renovation</i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="renovation-card w-100">
+                <div class="vstack gap-1">
+                    <div>
+                        <div style="margin-top: 5px">
+                            <h6>Tags:</h6>
+                        </div>
+                        <div>
+                        <span class="tag-badge" th:each="tag : ${renovation.tags}">
+                            <span style="display: inline-flex">
+                                <span th:text="'#' + ${tag.tag}">Tag</span>
+                                <form class="tag-display" th:if="${isOwner}"
+                                      th:action="@{/myRenovations/{id}/deleteTag/(id=${renovation.id})}"
+                                      method="post">
+                                    <input type="hidden" th:value="${tag.tag}" name="tag">
+                                    <button class="button tag-remove" id="remove-tag-button" type="submit">
+                                       x
+                                    </button>
+                                </form>
+                            </span>
+                        </span>
+                        <div class="mt-2 mb-1">
+                            <i th:if="${renovation.tags.empty}">No tags for this renovation</i>
+                        </div>
+                        </div>
+                    </div>
+                    <!-- End tag display -->
+                    <!-- Tag input -->
+                    <div th:if="${isOwner}">
+                        <form th:if="${renovation.tags.size() < 5}" class="tag-form"
+                              th:action="@{/myRenovations/{id}(id=${renovation.id})}"
+                              method="post">
+                            <div class="d-flex gap-2 flex-column">
+                                <div class="d-flex flex-column flex-md-row autocomplete gap-2">
+                                    <input id="tagAutocomplete" class="flex-grow-1 tag-input form-control" autocomplete="off"
+                                           placeholder="Enter New Tag"
+                                           th:value="${tagName}" name="tagName" type="text">
+                                    <button class="button button-primary text-nowrap" type="submit" id="add-tag-button">
+                                        Add Tag
+                                    </button>
+                                </div>
+
+                                <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${tagError})}"/>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between flex-column flex-xxl-row gap-4 mt-3">
+            <a class="w-100 text-decoration-none"
+               th:href="@{/renovation/{id}/budget(id=${renovation.id})}">
+                <div class="vstack gap-1 budget-box renovation-card">
+                    <span class="fs text-break" th:text="${'$' + budgetSum}"></span>
+                    <h4 class="text-muted">Total Budget</h4>
+                </div>
+            </a>
+            <a class="w-100 text-decoration-none"
+               th:href="@{/renovation/{id}/expenses(id=${renovation.id})}">
+                <div class="vstack gap-1 budget-box renovation-card" th:classappend="${budgetSum - expenseSum < 0 ? 'spent-over' : 'still'}">
+                    <span class="fs text-break" th:text="${'$' + expenseSum}"></span>
+                    <h4 class="text-muted" th:text="'Spent Across ' + ${noOfExpenses} + ' Expense Items'"></h4>
+                </div>
+            </a>
+            <a class="w-100 text-decoration-none"
+               th:href="@{/renovation/{id}/tasks(id=${renovation.id})}">
+                <div class="vstack gap-1 budget-box renovation-card">
+                    <span class="fs text-break" th:text="${taskCount + ' Tasks'}"></span>
+                    <h4 class="text-muted">To Complete</h4>
+                </div>
+            </a>
+        </div>
+    </div>
+
+</th:block>
+<th:block th:fragment="scripts">
+    <script th:inline="javascript">
+        const renovationId = /*[[${renovation.id}]]*/ 0;
+    </script>
+    <script th:src="@{/javascript/tagAutocomplete.js}"></script>
+</th:block>

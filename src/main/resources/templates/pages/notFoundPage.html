@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Not Found :(</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}">
+    </th:block>
+</head>
+<body style="padding-top: 70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+<div style="display:flex; align-items:center; justify-content:center; height:75vh">
+    <div class="renovation-card" style="width:50%; height:45%;">
+        <div class="w-100" style="display:flex; flex-direction:column; align-items:center; justify-content:center">
+            <h1 class="not-found-text">404</h1>
+            <h3 class="not-found-text">Oops, This Page is Not Found :(</h3>
+            <h6 class="not-found-text">You may not have access to the page you were trying to reach</h6>
+            <a class="button button-primary" th:href="@{/}">Go Back Home</a>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

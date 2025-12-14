@@ -1,0 +1,29 @@
+<div th:fragment="filterTaskStatesDropdown(formAction)" class="dropdown d-flex justify-content-center align-items-center">
+    <button class="dropdown-toggle button button-outline-primary w-100"
+            type="button" id="filterStatesBtn"
+            data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="me-2">Filter States</span>
+    </button>
+    <form method="get"
+          th:action="@{${formAction}}">
+        <ul class="dropdown-menu w-100" aria-labelledby="filterStatesBtn">
+            <li th:each="state : ${T(nz.ac.canterbury.seng302.homehelper.model.renovation.TaskState).values()}"
+                class="dropdown-item mb-2">
+                <label class="form-check d-flex align-items-center gap-2">
+                    <input class="form-check-input task-filter-checkbox"
+                           type="checkbox"
+                           th:id="${state.getDisplayName}"
+                           name="states"
+                           th:value="${state}">
+                    <span class="badge" th:classappend="${state.getBadgeClassName()}"
+                          th:text="${state.getDisplayName}"></span>
+                </label>
+            </li>
+            <div class="d-flex justify-content-center p-2 mt-2">
+                <button class="button button-primary w-100" type="submit" id="filterApply">
+                    Apply Filters
+                </button>
+            </div>
+        </ul>
+    </form>
+</div>

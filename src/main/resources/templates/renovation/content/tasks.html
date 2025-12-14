@@ -1,0 +1,198 @@
+<th:block th:fragment="head">
+
+</th:block>
+<th:block th:fragment="content">
+    <div class="flex flex-column w-100">
+        <div class="d-flex flex-column flex-md-row align-content-md-center justify-content-between mb-2">
+            <div th:replace="~{fragments/renovation/renovationTitleFragment :: renovationTitle(${renovation.name}, false)}"></div>
+            <div class="my-auto">
+                <div class="d-flex flex-column flex-xl-row gap-2">
+                    <div th:insert="~{renovation/fragment/tasksFilterStatesDropdownFragment :: filterTaskStatesDropdown('/renovation/' + ${renovation.id} + '/tasks')}"></div>
+                    <a th:if="${isMember or isOwner}" class="button button-primary text-nowrap"
+                       th:href="@{/myRenovations/{id}/newTask(id=${renovation.id})}">
+                        Add New Task
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column gap-2">
+            <div class="tasks-container" th:fragment="tasksContainer(renovation, pagination)">
+                <div th:if="${pagination.items.empty}">
+                    <p class="fs-4 text-muted text-center">No tasks have been made yet.</p>
+                </div>
+
+                <div th:each="task : ${pagination.items}" class="card mb-4 shadow-sm renovation-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
+                            <!-- Left side: Icon + Title -->
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <img alt="Task Icon"
+                                     class="d-inline-block add-image-button"
+                                     height="30"
+                                     width="30"
+                                     th:src="@{'/images/task_icons/' + ${task.iconFileName}}"
+                                     style="cursor: pointer"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#iconModal"
+                                     th:data-task-id="${task.id}"
+                                     th:data-icon="${task.iconFileName}">
+                                <h5 class="mb-0 task-title" th:text="${task.name}">Task Name</h5>
+                            </div>
+
+                            <!-- Right side: Status & Due Date -->
+                            <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+                                <span class="badge"
+                                      th:classappend="${task.state.getBadgeClassName()}"
+                                      th:text="${task.state.getDisplayName()}">
+                                    </span>
+                                <span class="badge bg-secondary"
+                                      th:if="${task.getDueDate() != null}"
+                                      th:text="'Due ' + ${T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(task.getDueDate())}">
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <p class="mb-3 text-muted" th:text="${task.description}">Task Description</p>
+
+                        <!-- Bottom: Rooms and Edit button -->
+                        <div class="d-flex flex-column flex-md-row align-content-md-center justify-content-between">
+                            <!-- Rooms -->
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="room-badge"
+                                      th:each="room : ${task.rooms}"
+                                      th:text="${room.name}">
+                                </span>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="d-flex flex-column flex-md-row align-content-md-center justify-content-between mt-2 mt-md-0">
+                                <!-- View Button -->
+                                <a th:if="${isMember or isOwner}" class="button button-primary mt-2 mt-sm-0 me-md-2"
+                                   th:href="@{/renovation/{id}/tasks/{taskId}(id=${renovation.id}, taskId=${task.id})}">
+                                    View
+                                </a>
+
+                                    <!-- Edit Button -->
+                                    <a th:if="${isMember or isOwner}" class="button button-outline-primary mt-2 mt-sm-0"
+                                       th:href="@{/myRenovations/{id}/editTask/{taskId}(id=${renovation.id}, taskId=${task.id})}">
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-4"
+                     th:insert="~{fragments/paginationFragment.html :: paginationbar(pagination=${pagination})}">
+                </div>
+            </div>
+        </div>
+        <div th:if="${isMember or isOwner}" aria-hidden="true" aria-labelledby="taskIconModalLabel" class="modal fade" id="iconModal"
+             tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="taskIconModalLabel">Pick an Icon</h1>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                type="button"></button>
+                    </div>
+                    <form id="iconForm" method="post" th:action="@{'/renovation/' + ${renovation.id} + '/saveIcon'}">
+                        <input id=selectedIcon name="selectedIcon" type="hidden" value="">
+                        <input id="taskId" name="taskId" type="hidden" value="">
+                        <div class="modal-body">
+                            <button class="btn btn-outline-danger" data-icon="house.png" id="resetDefaultIcon"
+                                    type="button">
+                                Reset to default
+                            </button>
+                            <div class="outlined-div">
+                                <div id="taskIconDiv"
+                                     style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px">
+                                    <button class="task-icon-button" data-icon="house.png" id="defaultButton" type="button">
+                                        <img alt="House Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/house.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="carpentry.png" type="button">
+                                        <img alt="Carpentry Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/carpentry.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="clean_up.png" type="button">
+                                        <img alt="Clean up Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/clean_up.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="demolition.png" type="button">
+                                        <img alt="Demolition Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/demolition.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="door.png" type="button">
+                                        <img alt="Door Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/door.png}"
+                                             width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="electrical.png" type="button">
+                                        <img alt="Electrical Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/electrical.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="finishing_touches.png" type="button">
+                                        <img alt="Finishing touches Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/finishing_touches.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="flooring.png" type="button">
+                                        <img alt="Flooring Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/flooring.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="hvac.png" type="button">
+                                        <img alt="HVAC Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/hvac.png}"
+                                             width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="insulation.png" type="button">
+                                        <img alt="Insulation Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/insulation.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="landscaping.png" type="button">
+                                        <img alt="Landscaping Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/landscaping.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="painting.png" type="button">
+                                        <img alt="Painting Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/painting.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="plumbing.png" type="button">
+                                        <img alt="Plumbing Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/plumbing.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="roofing.png" type="button">
+                                        <img alt="Roofing Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/roofing.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="structural.png" type="button">
+                                        <img alt="Structural Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/structural.png}" width="30">
+                                    </button>
+                                    <button class="task-icon-button" data-icon="window.png" type="button">
+                                        <img alt="Windows Icon" height="30" style="margin: 5px"
+                                             th:src="@{/images/task_icons/window.png}" width="30">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                            <button class="button button-primary submit-button" type="submit">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+</th:block>
+<th:block th:fragment="scripts">
+    <script th:inline="javascript">
+        const states = /*[[${states}]]*/ [];
+    </script>
+    <script th:src="@{/javascript/stateFilter.js}"></script>
+    <script th:src="@{/javascript/activateTaskIcon.js}"></script>
+</th:block>

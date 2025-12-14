@@ -1,0 +1,89 @@
+<div aria-hidden="true" aria-labelledby="${id}+'Label" class="modal fade" tabindex="-1"
+     th:fragment="inviteMemberModal(renovation, modalId)" th:id="${modalId}">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renovationFormLongTitle">Invite Member</h5>
+            </div>
+            <form method="post" th:action="@{'/myRenovations/' + ${renovation.id} + '/invite'}" id="invitation-form">
+                <input type="hidden" name="tab" value="members">
+                <div>
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="invitation-input">Invite Members</label>
+                            <div class="d-flex justify-content-evenly gap-2 align-items-stretch">
+                                <div style="flex-grow: 1">
+                                    <input class="form-control" id="invitation-input"
+                                           placeholder="Enter email"
+                                           type="text" oninput="fetchSuggestedInvitees()">
+                                    <div id="autocomplete-results-container"></div>
+                                </div>
+                                <div>
+                                    <button class="button button-primary" id="add-invitee-button" type="button"
+                                            onclick="addButtonClicked()">Add
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="invitation-error" class="error-message" style="display: none">
+                                <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                     stroke-width="2"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" x2="12" y1="8" y2="12"/>
+                                    <line x1="12" x2="12.01" y1="16" y2="16"/>
+                                </svg>
+                                <span id="invitation-error-message"></span>
+                            </div>
+                        </div>
+                        <div id="added-invitees-div" class="d-flex flex-wrap gap-2"></div>
+                    </div>
+                    <div class="modal-footer px-0">
+                        <button class="button button-secondary" data-bs-dismiss="modal" type="button">
+                            Cancel
+                        </button>
+                        <button class="button button-primary" name="submitInvite" id="submit-invite" style="margin-right: 10px" type="button">
+                            Invite
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <script th:src="@{/javascript/addInvitee.js}"></script>
+        <script th:src="@{/javascript/autocompleteKeyBehaviour.js}"></script>
+        <style>
+            #autocomplete-results-container:empty {
+                display: none;
+            }
+
+            #autocomplete-results-container {
+                background-color: white;
+                border: 1px solid #ccc; /* outline */
+                border-radius: 4px; /* optional rounded corners */
+                z-index: 10;
+                overflow-y: auto;
+                overflow-x: hidden;
+                max-height: 200px;
+            }
+
+            #autocomplete-results-container .user-badge-template-div {
+                cursor: pointer;
+                padding: 5px;
+                margin: 0;
+            }
+
+            #autocomplete-results-container .user-badge-template-div:hover {
+                background-color: #f0f0f0;
+            }
+
+            .autocomplete-disabled-message {
+                font-size: 0.75rem;
+            }
+
+        </style>
+        <div th:replace="~{fragments/userBadgeTemplate :: userBadgeTemplate}"></div>
+        <div th:replace="~{fragments/inviteeBadgeTemplate :: inviteeBadgeTemplate}"></div>
+
+    </div>
+
+</div>

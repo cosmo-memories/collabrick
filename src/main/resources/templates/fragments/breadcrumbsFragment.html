@@ -1,0 +1,4 @@
+<link href="../../static/css/styles.css" rel="stylesheet">
+<div class="breadcrumbs mb-3" th:fragment="breadcrumbs(text, link)">
+    &larr; <a th:href="@{${link}}" th:text="${text}"></a>
+</div>

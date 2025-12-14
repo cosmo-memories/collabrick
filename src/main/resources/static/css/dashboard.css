@@ -1,0 +1,134 @@
+.dashboard-stat-cards-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+}
+
+.stat-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-label {
+    margin: 0;
+    color: var(--color-gray);
+}
+
+.stat-value {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.stat-icon {
+    border-radius: 50%;
+    padding: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-icon.text-success {
+    background-color: rgba(var(--bs-success-rgb), 0.15);
+}
+
+.stat-icon.color-primary{
+    background-color: color-mix(in srgb, white 75%, var(--color-primary));
+}
+
+.stat-icon.text-warning {
+    background-color: rgba(var(--bs-warning-rgb), 0.15);
+}
+
+.stat-icon.text-danger {
+    background-color: rgba(var(--bs-danger-rgb), 0.15);
+}
+
+
+.stat-icon svg {
+    height: 1.25rem;
+    width: 1.25rem;
+}
+
+.dashboard-recent-reno-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-recent-reno-stats-container {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dashboard-recent-reno-stat,
+.activity-timestamp {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-gray);
+}
+
+.dashboard-recent-reno-stat span,
+.activity-timestamp {
+    font-size: 0.75rem;
+}
+
+.activity-message .badge,
+.activity-message {
+    font-size: 0.75rem !important;
+}
+
+.dashboard-recent-reno-stat svg {
+    height: 1rem;
+    width: 1rem;
+}
+
+.upcoming-tasks-activity-feed-wrapper {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.upcoming-tasks-container {
+    justify-content: start !important;
+    width: 100%;
+}
+
+#activity-feed-container {
+    width: 100%;
+}
+
+@media (min-width: 1200px) {
+    .upcoming-tasks-container {
+        width: 50%;
+    }
+
+    #activity-feed-container {
+        width: 50%;
+    }
+
+
+    .upcoming-tasks-activity-feed-wrapper {
+        flex-direction: row;
+    }
+}
+
+@media (min-width: 900px) {
+    .dashboard-stat-cards-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.dashboard-clickable:hover {
+    background: #f4f6f8;
+}

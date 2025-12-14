@@ -1,0 +1,124 @@
+.renovation-layout-wrapper {
+    display: flex;;
+    height: calc(100vh - 70px); /* Adjust for navbar height */
+}
+
+.sidebar {
+    width: 16rem;
+    border-right: 1px solid #e5e7eb;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+}
+
+@media screen and (max-width: 992px) {
+    .sidebar {
+        display: none;
+    }
+}
+
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: auto;
+    width: 100%;
+}
+
+.main-content.scrollable {
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Specific to the renovation sidebar and mobile main navbar */
+.chat-channels {
+    padding: 0 0.5rem;
+}
+
+.chat-channel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    color: #374151;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    text-align: left;
+}
+
+.chat-channel.active {
+    background-color: #193cb8;
+    color: #ffffff;
+}
+
+
+.chat-channel-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.chat-channel-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.chat-channel-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.team-members {
+    padding: 0 0.5rem;
+}
+
+.team-member {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.team-member-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.team-member-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.team-member-role {
+    font-size: 0.75rem;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.invite-member-button .new-channel-button {
+    color: #6b7280;
+    filter: brightness(1.2);
+}
+
+.invite-member-button:hover .new-channel-button:hover {
+    filter: brightness(1.2);
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${isNewTask ? 'Add Task' : 'Edit Task'}"></title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}"></th:block>
+</head>
+<body style="padding-top:70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 48rem;">
+    <div class="container position-relative">
+        <h3 class="m-0 text-center" th:text="${isNewTask ? 'Add Task' : 'Edit Task'}"></h3>
+        <form class="renovation-card"
+              id="taskForm"
+              method="post"
+              th:with="formAction=${isNewTask == true} ?  '/myRenovations/' + ${renovation.id} + '/newTask' : '/myRenovations/' + ${renovation.id} + '/editTask/' + ${task.id}"
+              th:action="@{${formAction}}"
+              th:object="${user}">
+            <!-- ChatGPT helped figure out why this wasn't posting on the test server, it wrote the th:with and th:action-->
+            <div class="w-100">
+                <div class="form-group mb-3">
+                    <label class="form-label" for="nameInput">
+                        Name
+                        <th:block th:insert="~{fragments/requiredInputFragment.html :: requiredInput}"/>
+                    </label>
+                    <input autocomplete="off" class="form-control" id="nameInput" name="taskName"
+                           placeholder="Enter Task Name"
+                           th:classappend="${taskNameError} != null ? ' error' : ''" th:value="${taskName}"
+                           type="text">
+                    <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${taskNameError})}"/>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label class="form-label" for="descriptionInput">
+                        Description
+                        <th:block th:insert="~{fragments/requiredInputFragment.html :: requiredInput}"/>
+                    </label>
+                    <div class="char-counter-wrapper">
+                        <textarea class="char-counter form-control" data-char-max="512" id="descriptionInput"
+                                  name="taskDescription" placeholder="Enter your Task description" rows="5"
+                                  th:classappend="${taskDescriptionError} != null ? ' error' : ''"
+                                  th:text="${taskDescription}"></textarea>
+                        <div class="d-flex">
+                            <th:block
+                                    th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${taskDescriptionError})}"/>
+                            <p class="char-counter-label ms-auto"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3" id="dateContainer">
+                    <label class="form-label text-decoration-none" for="dateInput">Select Date</label>
+                    <input class="form-control" id="dateInput" name="taskDueDate" oninvalid=""
+                           th:classappend="${taskDueDateError} != null ? ' error' : ''"
+                           th:value="${taskDueDate}" type="date" min="0001-01-01">
+                    <input id="dateInvalid" name="dateInvalid" type="hidden" >
+                    <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${taskDueDateError})}"/>
+                </div>
+                <div class="d-flex flex-column flex-md-row gap-4 mb-3 me-md-4">
+                    <div class="col-12 order-2 col-md-6 order-md-1">
+                        <label for="roomDropdown" class="form-label">Rooms</label>
+                        <div class="dropdown">
+                            <button id="roomDropdown"
+                                    class="form-control btn-white border dropdown-toggle w-100 d-flex justify-content-between align-items-center p-2"
+                                    type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                Select rooms
+                            </button>
+                            <ul class="dropdown-menu w-100 p-2">
+                                <li class="d-flex align-items-center" th:each="room : ${renovation.rooms}">
+                                    <label class="form-check-label text-break" th:for="'room' + ${room.getId()}">
+                                        <input class="form-check-input" name="roomId"
+                                               th:checked="${roomIds != null and #lists.contains(roomIds, room.id)}"
+                                               th:data-room-name="${room.getName()}"
+                                               th:id="${room.getId()}"
+                                               th:value="${room.getId()}" type="checkbox">
+                                    </label>
+                                    <span class="text-break" th:text="${room.getName()}">
+                                                        Room Name</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12 order-1 col-md-6 order-md-2">
+                        <label for="taskStateDropdownButton" class="form-label">State</label>
+                        <div class="dropdown">
+                            <button id="taskStateDropdownButton"
+                                    class="form-control btn-white border dropdown-toggle w-100 d-flex justify-content-between align-items-center p-2"
+                                    type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <!-- Badge will appear here -->
+                            </button>
+                            <ul class="dropdown-menu w-100 p-2">
+                                <li><a class="dropdown-item badge-select"
+                                       th:classappend="${taskState.name() == 'NOT_STARTED' ? ' default-task-status' : ''}"
+                                       href="#"
+                                       data-value="NOT_STARTED"><span class="badge bg-secondary">Not Started</span></a>
+                                </li>
+                                <li><a class="dropdown-item badge-select"
+                                       th:classappend="${taskState.name() == 'IN_PROGRESS' ? ' default-task-status' : ''}"
+                                       href="#"
+                                       data-value="IN_PROGRESS"><span class="badge bg-primary">In Progress</span></a>
+                                </li>
+                                <li><a class="dropdown-item badge-select"
+                                       th:classappend="${taskState.name() == 'BLOCKED' ? ' default-task-status' : ''}"
+                                       href="#"
+                                       data-value="BLOCKED"><span class="badge bg-warning">Blocked</span></a></li>
+                                <li><a class="dropdown-item badge-select"
+                                       th:classappend="${taskState.name() == 'COMPLETED' ? ' default-task-status' : ''}"
+                                       href="#"
+                                       data-value="COMPLETED"><span class="badge bg-success">Completed</span></a></li>
+                                <li><a class="dropdown-item badge-select"
+                                       th:classappend="${taskState.name() == 'CANCELLED' ? ' default-task-status' : ''}"
+                                       href="#"
+                                       data-value="CANCELLED"><span class="badge bg-danger">Cancelled</span></a></li>
+                            </ul>
+                        </div>
+                        <input type="hidden" name="state" id="stateInput">
+                    </div>
+                </div>
+
+                <div class="renovation-rooms" id="addedRooms">
+
+                </div>
+                <!-- Carries over information we need to determine where to send user after editing a task -->
+                <input name="pageNumber" th:value="${pageNumber}" type="hidden">
+                <input name="referer" th:value="${referer}" type="hidden">
+                <input name="dateStr" th:value="${isNewTask ? '' : taskDueDate}" type="hidden">
+
+                <!-- These cancel buttons only appear in certain circumstances so that only one appears at any given time -->
+                <div class="d-flex flex-column-reverse flex-md-row justify-content-end align-items-md-center mt-2 mt-md-0 gap-2">
+                    <!-- If tab is 'calendar', include both tab and dateStr -->
+                    <a class="button button-secondary"
+                       th:if="${referer == 'calendar' && taskDueDate != null && !isNewTask}"
+                       th:href="@{/renovation/{id}/calendar(id=${renovation.id}, page=${pageNumber}, dateStr=${taskDueDate})}">
+                        Cancel
+                    </a>
+
+                    <!-- Otherwise, only include page -->
+                    <a class="button button-secondary"
+                       th:if="${referer == 'tasks'}"
+                       th:href="@{/renovation/{id}/tasks(id=${renovation.id}, page=${pageNumber})}">
+                        Cancel
+                    </a>
+
+                    <!-- If adding a new task from the calendar, don't return a date to highlight -->
+                    <a class="button button-secondary"
+                       th:if="${referer == 'calendar' && isNewTask}"
+                       th:href="@{/renovation/{id}/{referer}(id=${renovation.id}, referer=${referer})}">
+                        Cancel
+                    </a>
+
+                    <a class="button button-secondary"
+                       th:if="${referer != 'calendar' && referer != 'tasks' && !isNewTask}"
+                       th:href="@{/renovation/{id}/tasks/{taskId}(id=${renovation.id}, taskId=${task.id})}">
+                        Cancel
+                    </a>
+
+                    <a class="button button-secondary"
+                       th:if="${referer != 'calendar' && referer != 'tasks' && referer != 'task' && isNewTask}"
+                       th:href="@{/renovation/{id}/tasks(id=${renovation.id})}">
+                        Cancel
+                    </a>
+
+                    <button autofocus class="button button-primary submit-button" id="submitButton"
+                            th:text="${isNewTask ? 'Create' : 'Submit'}"
+                            type="submit"></button>
+                </div>
+            </div>
+        </form>
+</div>
+<script> const isNewTask = /*[[${isNewTask}]]*/ false; </script>
+<script th:src="@{/javascript/setStateColour.js}"></script>
+<script th:src="@{/javascript/charCounter.js}"></script>
+<script th:src="@{/javascript/submitTaskForm.js}"></script>
+<script th:src="@{/javascript/taskRoomBadges.js}"></script>
+</body>
+</html>

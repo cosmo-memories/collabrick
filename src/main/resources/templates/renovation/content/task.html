@@ -1,0 +1,70 @@
+<th:block th:fragment="head">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</th:block>
+<div th:fragment="content">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end">
+        <div th:replace="~{fragments/renovation/renovationTitleFragment :: renovationTitle(${renovation.name}, false)}"></div>
+        <a class="button button-outline-primary"
+           th:href="@{/myRenovations/{id}/editTask/{taskId}(id=${renovation.id}, taskId=${task.id})}">Edit</a>
+    </div>
+    
+    <div class="d-flex flex-column gap-4 mt-3">
+
+        <!-- Task Details Box -->
+        <div class="renovation-card">
+            <div class="renovation-content">
+
+                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                    <!-- Name and Icon -->
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <img alt="Task Icon"
+                             class="d-inline-block"
+                             height="30"
+                             width="30"
+                             th:src="@{'/images/task_icons/' + ${task.iconFileName}}">
+                        <h1 th:text="${task.name}"></h1>
+                    </div>
+
+                    <!-- Status and Date -->
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <span class="badge"
+                              th:classappend="${task.state.getBadgeClassName()}"
+                              th:text="${task.state.getDisplayName()}">
+                        </span>
+                        <span class="badge bg-secondary"
+                              th:if="${task.getDueDate() != null}"
+                              th:text="'Due ' + ${T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(task.getDueDate())}">
+                        </span>
+                    </div>
+                </div>
+                <!-- Description -->
+                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                    <p class="renovation-description mt-3" th:text="${task.description}"></p>
+                </div>
+                <!-- Room List -->
+                <div>
+                    <h6 th:if="${task.rooms.size > 0}">Rooms:</h6>
+                </div>
+                <div class="renovation-rooms">
+                    <span class="room-badge" th:each="room : ${task.rooms}">
+                        <span th:text="${room.name}">Room Name</span>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Expenses -->
+        <div class="expense-card">
+            <div class="renovation-content">
+                <div th:replace="~{fragments/renovation/taskExpenses :: taskExpenses(canEdit=${true})}"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<th:block th:fragment="scripts">
+    <script th:src="@{/javascript/collapsible.js}"></script>
+    <script th:src="@{/javascript/taskExpenses.js}"></script>
+</th:block>

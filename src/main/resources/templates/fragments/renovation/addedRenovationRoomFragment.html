@@ -1,0 +1,18 @@
+<th:block th:fragment="addedRoomTemplate">
+    <template id="addedRoomTemplate">
+        <div class="row input-row">
+            <div class="col-md-8 mb-3">
+                <input class="room-input form-control" name="roomName[]" readonly
+                       style="pointer-events: none; background-color: #f9f9f9; color: #555"
+                       type="text">
+                <input class="room-input-id" name="roomIds[]" type="hidden">
+            </div>
+            <div class="col-md-4 mb-3 d-grid">
+                <button class="room-delete-button button button-red" type="button">Delete</button>
+            </div>
+            <div class="col-12">
+                <span class="room-error-message alert alert-danger mt-3" role="alert"></span>
+            </div>
+        </div>
+    </template>
+</th:block>

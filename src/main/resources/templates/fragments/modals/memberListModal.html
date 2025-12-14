@@ -1,0 +1,33 @@
+<div class="modal fade"
+     th:fragment="memberListModal(id)"
+     th:id="${id}"
+     tabindex="-1"
+     aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renovationFormLongTitle">Member List</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                <div class="modal-body pt-1" style="max-height: 25rem; overflow-y: auto">
+                    <div th:each="member, iterStat : ${channel.members}"
+                         class="team-members">
+                        <div class="team-member">
+                            <img th:if="${member.image != null}"
+                                 th:src="@{${'/'} + ${member.image}}"
+                                 class="rounded-circle" height="32" width="32" alt="User Image"/>
+                            <img th:if="${member.image == null}"
+                                 th:src="@{/images/PlaceholderIcon.png}"
+                                 class="rounded-circle" height="32" width="32" alt="User Image"/>
+                            <div class="team-member-info">
+                                <div class="team-member-name" th:text="|${member.fname} ${member.lname}|"></div>
+                            </div>
+                        </div>
+                        <hr class="m-0" th:if="${!iterStat.last}">
+                    </div>
+
+
+                </div>
+        </div>
+    </div>
+</div>

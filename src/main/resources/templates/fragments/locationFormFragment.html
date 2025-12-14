@@ -1,0 +1,77 @@
+<div th:fragment="locationForm()">
+    <label class="form-label" for="location">Location</label>
+    <div id="location" th:object="${location}">
+        <div style="font-size: 0.9em; color: grey;">If you choose to provide a location, all fields except Suburb and Region are required.</div>
+        <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${fieldError})}"/>
+        <div class="row pt-2">
+            <div class="col">
+                <label class="form-label small-label" for="streetAddress">Street Address</label>
+                <input type="text" class="form-control" id="streetAddress" name="streetAddress"
+                       autocomplete="off" th:field="*{streetAddress}" placeholder="Street Address" oninput="fetchSuggestions()" th:classappend="${streetError} != null ? ' error' : ''">
+                <div id="results"></div>
+                <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${streetError})}"/>
+            </div>
+        </div>
+        <div class="row pt-4">
+            <div class="col-md-6">
+                <label class="form-label small-label" for="suburb">Suburb</label>
+                <input type="text" class="form-control" id="suburb" name="suburb" autocomplete="off" th:field="*{suburb}"
+                       placeholder="Suburb" th:classappend="${suburbError} != null ? ' error' : ''">
+                <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${suburbError})}"/>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small-label" for="city">City</label>
+                <input type="text" class="form-control" id="city" name="city" autocomplete="off" th:field="*{city}" placeholder="City"
+                       th:classappend="${cityError} != null ? ' error' : ''">
+                <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${cityError})}"/>
+            </div>
+        </div>
+        <div class="row pt-4 pb-2">
+            <div class="col-md-6">
+                <label class="form-label small-label" for="region">Region</label>
+                <input type="text" class="form-control" id="region" name="region" autocomplete="off" th:field="*{region}" placeholder="Region"
+                       th:classappend="${regionError} != null ? ' error' : ''">
+                <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${regionError})}"/>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small-label" for="postcode">Postal Code</label>
+                <input type="text" class="form-control" id="postcode" name="postcode"  autocomplete="off" th:field="*{postcode}"
+                       placeholder="Postal Code" th:classappend="${postcodeError} != null ? ' error' : ''">
+                <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${postcodeError})}"/>
+            </div>
+        </div>
+        <div class="row pt-3 pb-2">
+            <div class="col-md-6">
+                <label class="form-label small-label" for="country">Country</label>
+                <input type="text" class="form-control" id="country" autocomplete="off" th:field="*{country}" name="country"
+                       placeholder="Country" th:classappend="${countryError} != null ? ' error' : ''">
+                <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${countryError})}"/>
+            </div>
+        </div>
+        <script th:src="@{/javascript/locationAutocomplete.js}"></script>
+
+        <style>
+            #results:empty {
+                display: none;
+            }
+
+            #results {
+                overflow-y: auto;
+                background-color: white;
+                border: 1px solid #ccc; /* outline */
+                border-radius: 4px; /* optional rounded corners */
+                z-index: 10;
+            }
+
+            #results p {
+                cursor: pointer;
+                padding: 5px;
+                margin: 0;
+            }
+
+            #results p:hover {
+                background-color: #f0f0f0;
+            }
+        </style>
+    </div>
+</div>

@@ -1,0 +1,245 @@
+// Team 900
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'jacoco'
+    id 'org.sonarqube' version '4.0.0.2929'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.named("check") {
+    dependsOn test, integration, cucumber, end2end
+}
+
+tasks.named('test') {
+// Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching "nz.ac.canterbury.seng302.homehelper.unit.*"
+    }
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+// The unitTestReport will be run after the unit test task has completed
+    finalizedBy jacocoTestReport
+}
+
+tasks.register("integration", Test) {
+    group 'verification'
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching "nz.ac.canterbury.seng302.homehelper.integration.*"
+    }
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+// The integrationTestReport will be run after the integration test task has completed
+    finalizedBy "integrationTestReport"
+}
+
+// This is commented out as it currently breaks the pipeline due to there being no acceptance tests
+tasks.register("cucumber", Test) {
+    group 'verification'
+    testLogging.showStandardStreams = true
+    systemProperty "spring.config.additional-location",
+            "classpath:/application.properties"
+    useJUnitPlatform()
+    filter {
+// Ensure this lines up with the package your cucumber tests are located in
+        includeTestsMatching "nz.ac.canterbury.seng302.homehelper.cucumber.RunCucumberTest"
+    }
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        exceptionFormat = "full"
+    }
+
+// The cucumberTestReport will be run after the cucumber test task has completed
+    finalizedBy "cucumberTestReport"
+}
+
+tasks.register("end2end", Test) {
+    testLogging.showStandardStreams = true
+    useJUnitPlatform()
+    filter {
+        // Ensure this lines up with the package your end2end tests are located in
+        includeTestsMatching "nz.ac.canterbury.seng302.homehelper.end2end.*"
+    }
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        exceptionFormat = "full"
+    }
+
+    // The end2endTestReport will be run after the cucumber test task has completed
+    finalizedBy "end2endTestReport"
+}
+
+jacocoTestReport { // Generate a report for all generated test data
+
+    reports {
+        xml.required = true
+        xml.destination file("${buildDir}/jacoco/test-report.xml")
+        csv.required = false
+        html.destination file("${buildDir}/reports/coverage/overall")
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "seng302-2025-team900"
+        property "sonar.projectName", "seng302-2025-team900"
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.host.url", "https://sonarqube.csse.canterbury.ac.nz"
+        property "sonar.login", System.env.SONARQUBE_TOKEN
+        if (System.env.CI_MERGE_REQUEST_IID == null || System.env.CI_MERGE_REQUEST_IID.trim().isEmpty()) {
+            property "sonar.branch.name", System.env.CI_COMMIT_REF_NAME
+        } else {
+            property "sonar.pullrequest.key", System.env.CI_MERGE_REQUEST_IID
+            property "sonar.pullrequest.branch", System.env.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+            property "sonar.pullrequest.base", System.env.CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+        }
+    }
+}
+
+tasks.register("unitTestReport", JacocoReport) { // Generate a report for unit tests
+    group = 'verification'
+    onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
+        return !project.hasProperty('skipTestReport')
+    }
+    dependsOn test
+    executionData project.tasks.test
+    sourceDirectories = project.files(project.sourceSets.main.allSource.srcDirs)
+    classDirectories = project.sourceSets.main.output
+    reports {
+// The jacoco coverage report will ge generated in the destination below
+        html.destination file("${buildDir}/reports/coverage/test")
+        xml.required = true
+        xml.destination file("${buildDir}/reports/coverage/test.xml")
+    }
+}
+
+tasks.register("integrationTestReport", JacocoReport) { // Generate a report for integration tests
+    group = 'verification'
+    onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
+        return !project.hasProperty('skipTestReport')
+    }
+    dependsOn integration
+    executionData project.tasks.integration
+    sourceDirectories = project.files(project.sourceSets.main.allSource.srcDirs)
+    classDirectories = project.sourceSets.main.output
+    reports {
+// The jacoco coverage report will ge generated in the destination below
+        html.destination file("${buildDir}/reports/coverage/integration")
+        xml.required = true
+        xml.destination file("${buildDir}/reports/coverage/integration.xml")
+    }
+}
+
+tasks.register("cucumberTestReport", JacocoReport) { // Generate a report for cucumber tests
+    group = 'verification'
+    onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
+        return !project.hasProperty('skipTestReport')
+    }
+    dependsOn cucumber
+    executionData project.tasks.cucumber
+    sourceDirectories = project.files(project.sourceSets.main.allSource.srcDirs)
+    classDirectories = project.sourceSets.main.output
+    reports {
+// The jacoco coverage report will ge generated in the destination below
+        html.destination file("${buildDir}/reports/coverage/cucumber")
+        xml.required = true
+        xml.destination file("${buildDir}/reports/coverage/cucumber.xml")
+    }
+}
+
+tasks.register("end2endTestReport", JacocoReport) { // Generate a report for cucumber tests
+    group = 'verification'
+    onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
+        return !project.hasProperty('skipTestReport')
+    }
+    dependsOn end2end
+    executionData project.tasks.end2end
+    sourceDirectories.setFrom(project.files(project.sourceSets.main.allSource.srcDirs))
+    classDirectories.setFrom(project.sourceSets.main.output)
+    reports {
+        // The jacoco coverage report will ge generated in the destination below
+        html.destination file("${buildDir}/reports/coverage/end2end")
+        xml.required = true
+        xml.destination file("${buildDir}/reports/coverage/end2end.xml")
+    }
+}
+
+
+tasks.named("unitTestReport").configure { finalizedBy 'jacocoTestReport' }
+tasks.named("integrationTestReport").configure { finalizedBy 'jacocoTestReport' }
+tasks.named("cucumberTestReport").configure { finalizedBy 'jacocoTestReport' }
+tasks.named("end2endTestReport").configure { finalizedBy "jacocoTestReport" }
+
+tasks.register("testAll") {
+    group = "verification"
+    dependsOn 'test', 'integration', 'cucumber'
+    finalizedBy 'jacocoTestReport'
+}
+
+
+group = 'nz.ac.canterbury.seng302'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.security:spring-security-test'
+    implementation 'com.h2database:h2'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
+    implementation 'org.webjars:webjars-locator:0.52'
+    implementation 'org.webjars:bootstrap:5.3.3'
+    // Chart.js Spike
+    implementation 'org.webjars.npm:chart.js:4.5.0'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.2'
+
+    // Tika Spike
+    implementation 'org.apache.tika:tika-core:3.1.0'
+
+    // Web Socket Stuff
+    implementation 'org.webjars.npm:stomp__stompjs:7.1.1'
+
+    // AI spike
+    // https://github.com/spring-projects/spring-ai/blob/main/spring-ai-spring-boot-starters/spring-ai-starter-model-openai/pom.xml
+    // spring ai starter has not been updated to 1.1.0-M1 so manually defining all the dependencies with latest version
+    var springAiVersion = "1.1.0-M1"
+    implementation("org.springframework.ai:spring-ai-bom:$springAiVersion")
+    implementation("org.springframework.ai:spring-ai-model:$springAiVersion")
+    implementation("org.springframework.ai:spring-ai-autoconfigure-model-openai:$springAiVersion")
+    implementation("org.springframework.ai:spring-ai-openai:$springAiVersion")
+    implementation("org.springframework.ai:spring-ai-autoconfigure-model-chat-client:$springAiVersion")
+    implementation("org.springframework.ai:spring-ai-model-chat-memory-repository-jdbc:$springAiVersion")
+
+    // Cucumber dependencies
+    testImplementation 'io.cucumber:cucumber-java:7.15.0'
+    testImplementation 'io.cucumber:cucumber-spring:7.15.0'
+    testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.15.0'
+    testImplementation 'org.junit.platform:junit-platform-suite:1.10.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // E2E tests
+    testImplementation "com.microsoft.playwright:playwright:1.45.0"
+
+
+}

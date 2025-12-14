@@ -1,0 +1,75 @@
+<div class="tasks-container" th:fragment="tasksContainer(renovation, pagination, canEdit, isMember)">
+    <link rel="stylesheet" href="../../../static/css/styles.css">
+
+    <div class="tasks-container" th:fragment="tasksContainer(renovation, pagination)">
+        <div th:if="${pagination.items.empty}">
+            <p class="fs-4 text-muted text-center">No tasks have been made yet.</p>
+        </div>
+
+        <div th:each="task : ${pagination.items}" class="card mb-4 shadow-sm renovation-card">
+            <div class="card-body">
+                <!-- Header: Icon + Name | Status + Due -->
+                <div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
+                    <!-- Left side: Icon + Title -->
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <img alt="Task Icon"
+                             class="d-inline-block"
+                             height="30"
+                             width="30"
+                             th:src="@{'/images/task_icons/' + ${task.iconFileName}}"
+                             style="cursor: pointer"
+                             data-bs-toggle="modal"
+                             data-bs-target="#iconModal">
+                        <h5 class="mb-0 task-title" th:text="${task.name}">Task Name</h5>
+                    </div>
+
+                    <!-- Right side: Status & Due Date -->
+                    <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+                    <span class="badge"
+                          th:classappend="${task.state.getBadgeClassName()}"
+                          th:text="${task.state.getDisplayName()}">
+                    </span>
+                        <span class="badge bg-secondary"
+                              th:if="${task.getDueDate() != null}"
+                              th:text="'Due ' + ${T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(task.getDueDate())}">
+                    </span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <p class="mb-3 text-muted" th:text="${task.description}">Task Description</p>
+
+                <!-- Bottom: Rooms and Edit button -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Rooms -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="room-badge"
+                              th:each="room : ${task.rooms}"
+                              th:text="${room.name}">
+                        </span>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div>
+                        <!-- View Button -->
+                        <a th:if="${canEdit or isMember}" class="button button-primary mt-2 mt-sm-0 me-2"
+                           th:href="@{/myRenovations/{id}/task/{taskId}(id=${renovation.id}, taskId=${task.id})}">
+                            View
+                        </a>
+
+                        <!-- Edit Button -->
+                        <a th:if="${canEdit or isMember}" class="button button-outline-primary mt-2 mt-sm-0"
+                           th:href="@{/myRenovations/{id}/editTask/{taskId}(id=${renovation.id}, taskId=${task.id})}">
+                            Edit
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-4"
+             th:insert="~{fragments/paginationFragment.html :: paginationbar(pagination=${pagination})}">
+        </div>
+    </div>
+</div>

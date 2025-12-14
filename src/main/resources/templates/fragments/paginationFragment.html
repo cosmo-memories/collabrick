@@ -1,0 +1,91 @@
+<div th:fragment="paginationbar(pagination)">
+    <nav>
+        <ul class="pagination-container">
+            <!-- First page -->
+            <li class="pagination-item pagination-button"
+                th:if="${pagination.showJumpPageButtons()}"
+                th:classappend="${pagination.hasPreviousPage()} ? '' : 'disabled'"
+                th:data-url="@{${pagination.getFirstPageUrl()}}">
+                <a class="page-link"
+                   th:href="@{${pagination.getFirstPageUrl()}}">« First</a>
+            </li>
+
+            <!-- Previous page -->
+            <li class="pagination-item pagination-button"
+                th:if="${pagination.hasPages()}"
+                th:classappend="${pagination.hasPreviousPage()} ? '' : 'disabled'"
+                th:data-url="@{${pagination.getPreviousPageUrl()}}">
+                <a class="page-link"
+                   th:href="@{${pagination.getPreviousPageUrl()}}">Prev</a>
+            </li>
+
+            <!-- Page numbers -->
+            <li class="pagination-item pagination-number"
+                th:each="pageLink : ${pagination.getVisiblePageLinks()}"
+                th:classappend="${pageLink.pageNumber == pagination.currentPage} ? 'pagination-current'"
+                th:data-url="@{${pageLink.url}}">
+                <a class="page-link"
+                   th:href="@{${pageLink.url}}"
+                   th:text="${pageLink.pageNumber}"></a>
+            </li>
+
+            <!-- Next page -->
+            <li class="pagination-item pagination-button"
+                th:if="${pagination.hasPages()}"
+                th:classappend="${pagination.hasNextPage()} ? '' : 'disabled'"
+                th:data-url="@{${pagination.getNextPageUrl()}}">
+                <a class="page-link"
+                   th:href="@{${pagination.getNextPageUrl()}}">Next</a>
+            </li>
+
+            <!-- Last Page -->
+            <li class="pagination-item pagination-button"
+                th:if="${pagination.showJumpPageButtons()}"
+                th:classappend="${pagination.hasNextPage()} ? '' : 'disabled'"
+                th:data-url="@{${pagination.getLastPageUrl()}}">
+                <a class="page-link"
+                   th:href="@{${pagination.getLastPageUrl()}}">Last »</a>
+            </li>
+        </ul>
+
+        <form class="d-flex justify-content-center mt-2 gap-2" id="pageForm"
+              method="get"
+              th:if="${pagination.showJumpPageButtons()}">
+            <input type="hidden" name="page" th:value="${pagination.getCurrentPage()}">
+            <input type="hidden" name="search" th:value="${search}" />
+            <input class="form-control" name="gotoPage" placeholder="Page #"
+                   style="width: 80px;"
+                   th:value="${gotoPage}" id="paginationInput" type="text">
+            <span class="align-self-center">of <span th:text="${pagination.getTotalPages()}"></span></span>
+            <button class="button button-primary btn-sm" id="paginationSubmitBtn" disabled>Go</button>
+        </form>
+        <script>
+            const input = document.getElementById('paginationInput');
+            const button = document.getElementById('paginationSubmitBtn');
+
+            if (input) {
+                input.addEventListener('input', () => {
+                    button.disabled = input.value.trim() === '';
+                });
+            }
+
+            // New click handler for pagination items
+            document.querySelectorAll('.pagination-item').forEach(item => {
+                item.addEventListener('click', (event) => {
+                    if (item.classList.contains('disabled')) {
+                        return;
+                    }
+                    event.preventDefault();
+
+                    const url = item.getAttribute('data-url');
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            });
+        </script>
+        <div class="d-flex justify-content-center">
+            <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${pageError})}"/>
+        </div>
+    </nav>
+</div>

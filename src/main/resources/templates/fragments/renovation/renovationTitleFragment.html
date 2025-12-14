@@ -1,0 +1,51 @@
+<div th:fragment="renovationTitle(title, showEditDelete)">
+    <div class="d-flex flex-column flex-md-row justify-content-between">
+        <div class="vstack gap-1">
+            <h1 class="text-break" th:text="${title}"></h1>
+            <div class="divider"></div>
+        </div>
+        <div th:if="${showEditDelete}" class="individual-renovation-content-container">
+            <div class="vstack gap-2">
+                <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                    <a class="button button-outline-primary"
+                       th:href="@{/myRenovations/{id}/editRenovation(id=${renovation.id})}">
+                        Edit
+                    </a>
+                    <button class="button button-outline-danger" data-bs-toggle="modal"
+                            th:data-bs-target="'#deleteModal' + ${renovation.id}" type="button">
+                        Delete
+                    </button>
+                </div>
+                <div class="flex-column d-flex flex-grow-1 justify-content-end gap-2 flex-xl-row">
+                    <div class="checkbox-wrapper form-check form-switch form-check-reverse flex-shrink-0 mb-2 mb-md-0">
+                        <form id="brickAIForm" method="POST">
+                            <input class="form-check-input" type="checkbox" value="true" id="brickAIOptOut"
+                                   name="allowBrickAI"
+                                   th:checked="${renovation.allowBrickAI}">
+                            <label class="form-check-label fs-6" for="brickAIOptOut" style="margin-left: 5px">
+                                Allow BrickAI to see renovation details
+                            </label>
+                        </form>
+                    </div>
+                    <span class="d-none chat-channel-name-notification ms-3 d-xl-block">|</span>
+                    <div class="checkbox-wrapper form-check form-switch form-check-reverse flex-shrink-0 mb-2 mb-md-0">
+                        <form id="visibilityForm" method="POST"
+                              th:action="@{/renovation/{id}/setVisibility(id=${renovation.id})}">
+                            <input type="hidden" name="isPublic" value="false">
+                        </form>
+                        <input class="form-check-input" type="checkbox" value="" id="publicRenovation"
+                               th:checked="${renovation.isPublic}">
+                        <label class="form-check-label fs-6" for="publicRenovation" style="margin-left: 5px">
+                            Make my renovation public
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div th:replace="~{fragments/modals/deleteRenovationConfirmation :: deleteRenovationConfirmation(renovation=${renovation}, modalId='deleteModal' + ${renovation.id})}"></div>
+            <div th:replace="~{fragments/modals/makeRenovationPublicConfirmation :: makeRenovationPublicConfirmation(renovation=${renovation})}"></div>
+            <div th:replace="~{fragments/modals/brickAIPermissionsModal :: allowBrickAIConfirmation(renovation=${renovation})}"></div>
+            <script th:src="@{/javascript/makeRenovationPublic.js}"></script>
+            <script th:src="@{/javascript/allowBrickAIPermissionsRenovation.js}"></script>
+        </div>
+    </div>
+</div>

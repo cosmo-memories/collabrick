@@ -1,0 +1,31 @@
+<div aria-hidden="true" aria-labelledby="${id}+'Label" class="modal fade" tabindex="-1"
+     th:fragment="newChannelModal(renovation, modalId)" th:id="${modalId}">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renovationFormLongTitle">Create Channel</h5>
+            </div>
+            <form method="post" th:action="@{'/renovation/' + ${renovation.id} + '/chat/new'}" id="new-channel-form">
+                <div class="modal-body">
+                    <input class="form-control" type="text" name="channelName"
+                           id="new-channel-input" placeholder="Enter Channel Name...">
+                    <div id="channel-error" class="error-message" style="display: none">
+                        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                             stroke-width="2"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" x2="12" y1="8" y2="12"/>
+                            <line x1="12" x2="12.01" y1="16" y2="16"/>
+                        </svg>
+                        <span id="channel-error-message"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="button button-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                    <button class="button button-primary" id="create-channel" type="submit">Create Channel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script th:src="@{/javascript/chat/chatChannelValidation.js}"></script>
+</div>

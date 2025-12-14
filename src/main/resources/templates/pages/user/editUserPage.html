@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="fragments/generalHeadersFragment.html :: headers">
+    </th:block>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+</head>
+<body style="padding-top:70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+<div class="container mt-5">
+
+    <!-- Profile Picture -->
+
+    <div class="jumbotron text-center">
+
+        <img th:if="${user.image != null}"
+             th:src="@{/{image}(image=${user.image})}"
+             class="rounded-circle" height="200" width="200" style="border-radius: 50%"  alt="User Image"/>
+        <img th:if="${user.image == null}"
+             src="/test/images/PlaceholderIcon.png"
+             class="rounded-circle" height="200" width="200" style="border-radius: 50%"  alt="User Image"/>
+        <div id="profilePictureDiv">
+            <form enctype="multipart/form-data" method="post" th:action="@{/iconUpload}">
+                <div class="profile-pic-form-group">
+                    <label class="button button-primary" for="fileInput">Edit profile picture</label>
+                    <input accept="image/*" class="file-input" id="fileInput" name="image" onchange="displayFileName()"
+                           type="file">
+                    <div class="horizontal-content-container" id="uploadDiv" style="display: none;">
+                        <span id="fileName" style="margin-right: 20px;"></span>
+                        <button class="button button-primary" id="uploadButton" type="submit">Upload</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <br/>
+        <div class="mb-3 text-center"
+             style="display:flex; flex-direction:column; align-items:center; justify-content:center"
+             th:if="${uploadError != null}">
+            <th:block th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${uploadError})}"/>
+        </div>
+    </div>
+
+    <div class="mx-auto container-fluid px-6 py-4" style="max-width: 48rem;">
+        <div class="container">
+            <div class="container mb-2">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                    <!-- This is an invisible spacer div to ensure the title remains centered -->
+                    <div class="flex-shrink-0 button button-outline-primary d-none d-md-block" style="width: auto; visibility: hidden;">
+                        Update Password
+                    </div>
+                    <h3 class="text-center m-0 flex-grow-1">Edit User Profile</h3>
+                    <a class="button button-outline-primary mt-2 mt-md-0"
+                       th:href="@{/update-password}">
+                        Update Password
+                    </a>
+                </div>
+            </div>
+            <form class="renovation-card" method="post" th:action="@{/userPage}" th:object="${editedUser}">
+                <div class="w-100">
+                    <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'First Name',
+                            true,
+                            'fname',
+                            'text',
+                            'Enter your first name',
+                            '',
+                            ${errors?.firstNameError},
+                            true
+                        )}"/>
+
+                    <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'Last Name',
+                            false,
+                            'lname',
+                            'text',
+                            'Enter your last name',
+                            '',
+                            ${errors?.lastNameError},
+                            true
+                        )}"/>
+
+                    <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'Email',
+                            true,
+                            'email',
+                            'text',
+                            'Enter email',
+                            'We\'ll never share your email with anyone else.',
+                            ${errors?.emailError},
+                            true
+                        )}"/>
+                    <th:block th:replace="~{fragments/locationFormFragment :: locationForm()}"/>
+                    <div class="d-flex flex-column-reverse flex-md-row justify-content-end align-items-md-center gap-2">
+                        <a class="button button-secondary" th:href="@{/userPage}">Cancel</a>
+                        <button class="button button-primary" type="submit">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    /* Displays the file name that has just been added by the file picker and the upload button to upload the file*/
+    function displayFileName() {
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const uploadDiv = document.getElementById('uploadDiv');
+        const uploadErrorMessage = document.getElementById('uploadError')
+        if (fileInput.files.length > 0) {
+            fileNameDisplay.textContent = `Selected file: ${fileInput.files[0].name}`;
+            uploadDiv.style.display = 'block';  // Show the submit button when a file is selected
+            uploadErrorMessage.textContent = "";
+        } else {
+            uploadDiv.style.display = 'none';  // Hide the submit button when no file is selected
+        }
+    }
+</script>

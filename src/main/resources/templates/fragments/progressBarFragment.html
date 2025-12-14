@@ -1,0 +1,23 @@
+<div class="progress-container" th:fragment="progressBar(title, currentValue, max, colour)">
+    <div class="progress-title">
+        <h5 th:classappend="${currentValue > max} ? ' color-red fw-bold' : '' " th:text="${title}"></h5>
+    </div>
+    <div class="progress"  th:classappend="${currentValue > max} ? ' over-budget' : ''">
+        <div th:if="${currentValue == 0 and max == 0}" class="progress-bar progress-bar-striped" role="progressbar"  th:style="'width: 100%; background-color: #ced4da !important'">
+            <span th:text="'N/A'" class="progress-label" style="color: #000000"></span>
+        </div>
+
+        <div th:if="${currentValue != 0 or max != 0}" class="progress-bar" th:classappend="${colour}" role="progressbar"  th:style="'width: ' + (${max} == 0 ? 100 : (${currentValue} * 100 / ${max})) + '%'"
+             aria-valuenow="${currentValue}"
+             aria-valuemin="0"
+             aria-valuemax="${max}">
+            <span th:if="${max} == 0 or (${currentValue} * 100 / ${max}) >= 15" th:text="'$' + ${currentValue}" class="progress-label"></span>
+
+        </div>
+        <span th:if="${max} != 0 and (${currentValue} * 100 / ${max}) < 15" th:text="'$' + ${currentValue}" class="progress-label-small"></span>
+    </div>
+    <div class="progress-cursors">
+        <span class="cursor max" th:text="'$' + (${currentValue})"></span>
+        <span class="cursor max" style="left: 100%;" th:text="'$' + ${max}" th:classappend="${currentValue > max} ? ' color-red fw-bold' : '' "></span>
+    </div>
+</div>

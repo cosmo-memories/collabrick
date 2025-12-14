@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Profile</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}">
+    </th:block>
+</head>
+<body style="padding-top:70px">
+
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 64rem;">
+    <div class="d-flex gap-3 justify-content-end">
+        <a class="button button-outline-primary"
+           th:href="@{/userPage/edit}">
+            Edit
+        </a>
+    </div>
+    <div class="user-card">
+        <div class="d-flex justify-content-end">
+            <div class="checkbox-wrapper form-check form-switch form-check-reverse flex-shrink-0 mb-2 mb-md-0">
+                <form id="brickAIForm" method="POST">
+                    <input class="form-check-input" type="checkbox" value="true" id="brickAIOptOut"
+                           name="allowBrickAI"
+                           th:checked="${user.allowBrickAIChatAccess}"
+                           onchange="setUserBrickAI()">
+                    <label class="form-check-label fs-6" for="brickAIOptOut" style="margin-left: 5px">
+                    Allow BrickAI to see my chat history</label>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-auto">
+                <div class="jumbotron">
+                    <img th:if="${user.image != null}"
+                         th:src="@{${'/'} + ${user.image}}"
+                         class="rounded-circle" height="150" width="150" style="border-radius: 50%" alt="User Image"/>
+                    <img th:if="${user.image == null}"
+                         th:src="@{/images/PlaceholderIcon.png}"
+                         class="rounded-circle" height="150" width="150" style="border-radius: 50%"  alt="User Image"/>
+                </div>
+            </div>
+            <div class="col flex-grow-1 d-flex flex-column justify-content-center" style="padding-left: 20px">
+                <span class="user-location" style="font-size: 30px" th:text="${user.fname} + ' ' + ${user.lname}">Not Found</span>
+                <i style="color: #6c757d" th:text="'Joined ' + ${T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(user.createdTimestamp)}"></i>
+            </div>
+        </div>
+        <div class="row pt-1">
+            <div class="col-auto" style="width: 170px">
+
+            </div>
+            <div class="col" style="padding-left: 20px">
+                <span style="color: #4e555b">Contact Information</span>
+                <br>
+                <div class="row" style="padding-top: 10px">
+                    <div class="col-12 col-sm-3">
+                        <span style="font-weight: bold">Email:</span>
+                    </div>
+                    <div class="col-12 col-sm-9">
+                        <span class="user-location" th:text="${user.email}">Not Found</span>
+                    </div>
+                </div>
+                <div class="row" style="padding-top: 10px">
+                    <div class="col-12 col-sm-3">
+                        <span style="font-weight: bold">Address:</span>
+                    </div>
+                    <div class="col-12 col-sm-9">
+                            <span class="user-location" th:if="${user.location.streetAddress != ''}" th:text="${user.location.streetAddress}">Not Found</span>
+                            <br th:if="${user.location.streetAddress != ''}" />
+                            <span class="user-location" th:if="${user.location.suburb != ''}" th:text="${user.location.suburb + ', ' + user.location.city}">Not Found</span>
+                            <br th:if="${user.location.suburb != ''}" />
+                            <span class="user-location" th:if="${user.location.postcode != ''}" th:text="${user.location.postcode}">Not Found</span>
+                            <br th:if="${user.location.postcode != ''}" />
+                            <span class="user-location" th:if="${user.location.country != ''}" th:text="${user.location.country}">Not Found</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    const baseUrl = /*[[${baseUrl}]]*/ false;
+</script>
+<script th:src="@{/javascript/allowBrickAIPermissionsUser.js}"></script>
+</body>
+</html>

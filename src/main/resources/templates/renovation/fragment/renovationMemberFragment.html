@@ -1,0 +1,31 @@
+<div th:fragment="member(type, id, name, image, role)" class="d-flex align-items-md-center p-3 renovation-card">
+    <div class="d-flex align-items-center w-100">
+        <img th:if="${image != null}"
+             th:src="@{${'/'} + ${image}}"
+             class="rounded-circle me-3 border shadow-sm"
+             height="50" width="50" alt="User Image">
+
+        <img th:if="${image == null}"
+             th:src="@{/images/PlaceholderIcon.png}"
+             class="rounded-circle me-3 border shadow-sm"
+             height="50" width="50" alt="User Image">
+
+        <div>
+            <h6 class="mb-0 text-break" th:text="${name}"></h6>
+            <small class="text-muted text-break" th:text="${role}"></small>
+        </div>
+
+        <button th:if="${isOwner and ((type == 'user' and role != 'Owner')
+                              or (type == 'invite' and role == 'Pending Invitation'))}"
+                class="button button-outline-danger ms-auto"
+                data-bs-toggle="modal"
+                th:data-bs-target="'#deleteModal' + ${id}"
+                type="button">
+            Remove
+        </button>
+
+
+
+    </div>
+    <div th:replace="~{fragments/modals/removeMemberModal :: removeMemberModal(type=${type}, name=${name}, memberId=${id}, modalId='deleteModal' + ${id})}"></div>
+</div>

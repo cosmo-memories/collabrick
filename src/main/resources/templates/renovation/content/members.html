@@ -1,0 +1,79 @@
+<th:block th:fragment="head">
+    <link th:href="@{/css/renovation/members.css}" rel="stylesheet"/>
+</th:block>
+<th:block th:fragment="content">
+    <div th:if="${showToast == true}" class="toast align-items-center border-0 position-absolute show confirmationToast" role="alert" aria-live="assertive" aria-atomic="true" id="invitationsSentToast"
+         style="background-color: #38c172; color: white;">
+        <div class="d-flex">
+            <div class="toast-body">
+                Invitations successfully sent!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div th:if="${showRemoveConfirmationToast == true}" class="toast align-items-center border-0 position-absolute show confirmationToast" role="alert" aria-live="assertive" aria-atomic="true"
+         style="background-color: #C44747; color: white;">
+        <div class="d-flex">
+            <div class="toast-body"
+                 th:text="'You have removed ' + ${removee} + ' from the renovation'">
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div class="flex flex-column w-100">
+
+        <div th:replace="~{fragments/renovation/renovationTitleFragment :: renovationTitle(${renovation.name}, false)}"></div>
+
+        <div class="row gy-1 gy-md-0 gx-md-1">
+            <!-- members card -->
+            <div class="col-12 col-md-6">
+                <div class="bg-light renovation-card me-md-1">
+                    <div class="d-flex flex-column flex-grow-1">
+                        <h5>Members</h5>
+                        <div class="d-flex flex-column gap-2">
+                            <th:block th:each="member : ${renovation.getSortedMembers()}"
+                                      th:with="user=${member.user}">
+                                <div class="bg-light" th:replace="~{renovation/fragment/renovationMemberFragment :: member(type='user',
+                                                                                                  id=${member.user.id},
+                                                                                                  name=${user.fname + ' ' + user.lname},
+                                                                                                  image=${user.image},
+                                                                                                  role=${member.role.displayName})}">
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- invitations card -->
+            <div class="col-12 col-md-6">
+                <div th:if="${isOwner}" class="bg-light renovation-card">
+                    <div class="d-flex flex-column flex-grow-1">
+                        <h5>Invitations</h5>
+                        <div class="d-flex flex-column gap-2">
+                            <th:block th:each="invitation : ${renovation.getSortedInvitations()}"
+                                      th:if="${invitation.invitationStatus.name() != 'ACCEPTED'}"
+                                      th:with="user=${invitation.user}">
+                                <div th:replace="~{renovation/fragment/renovationMemberFragment :: member(type='invite',
+                                                                                                  id=${invitation.id},
+                                                                                                  name=${user != null ? user.fname + ' ' + user.lname : invitation.email},
+                                                                                                  image=${user != null ? user.image : null},
+                                                                                                  role=${
+                                      invitation.invitationStatus.name() == 'PENDING'  ? 'Pending Invitation'  :
+                                     (invitation.invitationStatus.name() == 'EXPIRED' ? 'Expired Invitation'  :
+                                     (invitation.invitationStatus.name() == 'DECLINED' ? 'Declined Invitation' : null))
+                                     })}">
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:fragment="scripts">
+    <script th:src="@{/javascript/dismissToast.js}"></script>
+</th:block>

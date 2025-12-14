@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}">
+    </th:block>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+</head>
+<body style="padding-top:70px">
+    <nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+    <th:block th:if="!${isAuthenticated}" th:insert="~{fragments/home/loggedOutHomepage.html :: loggedOutHomepage}"></th:block>
+</body>
+</html>

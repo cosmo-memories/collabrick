@@ -1,0 +1,68 @@
+<div class="tasks-container" th:fragment="taskExpenses(canEdit)">
+  <link th:href="@{/css/collapsible.css}" rel="stylesheet" />
+
+  <div class="d-flex flex-column gap-2">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start flex-wrap">
+      <!-- Header -->
+      <h1 th:text="'Expenses'"></h1>
+
+      <!-- Button -->
+      <a class="button button-outline-primary mt-1"
+         th:href="@{/myRenovations/{id}/addTaskExpenses/{taskId}(id=${renovation.id}, taskId=${task.id})}">Add Expenses</a>
+    </div>
+
+    <!-- Expense Sum -->
+    <p class="renovation-description">
+      <b>Current total expenditure:</b>
+      <span class="expense-highlight" id="expenseTotal" th:text="${expenseTotal == 0} ? '$0.00' : '$' + ${expenseTotal}"></span>
+      NZD across
+      <span class="expense-highlight" id="expenseItems" th:text="${expenseItems}"></span>
+      expense items.
+    </p>
+
+    <!-- Expense List -->
+    <a class="button button-primary mt-1" id="expensesButton"
+      th:classappend="${#lists.isEmpty(task.expenses)} ? 'disabled-button' : 'collapsible'">View All Expenditures</a>
+    <div class="content" id="content">
+
+
+      <div th:each="expense : ${task.expenses}" class="card shadow-sm renovation-card" th:id="'expense-' + ${expense.id}">
+        <div class="card-body">
+
+            <!-- Left side: Name, Date, Category -->
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div class="text-break">
+                <span class="mb-1 task-title" th:text="${expense.expenseName}">Task Name</span>
+                <span class="expense-highlight" th:text="'$' + ${expense.expenseCost}"></span>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+              <div class="d-flex gap-2 flex-wrap">
+                <span class="badge bg-secondary"
+                      th:if="${expense.getExpenseDate() != null}"
+                      th:text="'Due ' + ${T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(expense.getExpenseDate())}"></span>
+                <span class="badge"
+                      th:classappend="${expense.expenseCategory.replaceAll(' ', '-').toLowerCase()}"
+                      th:text="${expense.expenseCategory}"></span>
+              </div>
+              <div class="mt-2 mt-md-0">
+                <button class="button button-outline-danger"
+                        style="font-size: 0.9rem;"
+                        th:onclick="'deleteExpense(' + ${task.id} + ', ' + ${expense.id} + ', ' + ${expense.expenseCost} + ')'">
+                  Delete
+                </button>
+              </div>
+            </div>
+
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+
+</div>

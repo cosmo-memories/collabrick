@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Browse Renovations</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}">
+    </th:block>
+</head>
+<body style="padding-top:70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 64rem;">
+    <div class="d-flex align-items-center justify-content-between">
+        <h3 class="m-0">Browse Renovations</h3>
+    </div>
+
+    <div class="mb-4">
+        <div class="renovation-card d-flex flex-column gap-2 mt-2">
+            <form class="d-flex flex-column flex-md-row gap-2">
+                <div class="dropdown flex-grow-1">
+                    <input name="search"
+                           id="searchInput"
+                           type="text"
+                           class="form-control"
+                           style="padding-right: 2.5em"
+                           placeholder="Search Renovations... "
+                           th:value="${search}"
+                    autocomplete="off"/>
+                    <ul class="dropdown-menu" aria-labelledby="searchInput">
+                        <!-- suggestions will be inserted here -->
+                    </ul>
+                    <button id="clearButton" type="button">&times</button>
+                    <div id="search-selected-tags-input" class="d-none">
+                        <!-- hidden container containing hidden inputs for selected tag names -->
+                    </div>
+                </div>
+                <button class="button button-primary">Search</button>
+            </form>
+
+            <div id="search-selected-tags" class="d-flex flex-wrap">
+                <!-- display for selected tag names -->
+            </div>
+
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start w-100 mt-2">
+                <div class="d-flex flex-wrap align-items-center w-100"
+                     th:with="isSearching=${!#strings.isEmpty(search) or !#lists.isEmpty(tags)}">
+                    <span class="mb-0 me-1"
+                          th:text="'Showing '
+                                  + ${isSearching ? 'search ' : ''}
+                                  + 'results in '
+                                  + ${onlyMine ? 'my' : 'public'}
+                                  + ' renovations'">
+                    </span>
+                </div>
+
+                <!-- Show my renovations checkbox -->
+                <div class="checkbox-wrapper form-check form-switch auth-tooltip flex-shrink-0 mt-2 mt-md-0"
+                     th:attr="data-bs-toggle=${!isAuthenticated ? 'tooltip' : null},
+                          title=${!isAuthenticated ? 'You must be logged in to use this option' : null}">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="show-my-renovations-checkbox"
+                           autocomplete="off"
+                           th:checked="${onlyMine}"
+                           th:disabled="${!isAuthenticated}">
+                    <label class="form-check-label ms-1" for="show-my-renovations-checkbox">
+                        Show my renovations
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${searchError != null}" class="text-muted text-center">
+        No renovations match your search
+    </div>
+
+    <div class="d-flex flex-column gap-2 mt-3">
+        <th:block th:each="renovation : ${pagination.items}" th:insert="~{fragments/renovationFragment :: renovationCard(renovation = ${renovation},
+                                                                                                                        myRenovationsPage=${false})}"/>
+    </div>
+    <div class="mt-4" th:insert="~{fragments/paginationFragment :: paginationbar(pagination=${pagination})}"></div>
+
+</div>
+
+<template id="search-tag-badge-template">
+    <span class="tag-badge">
+        #<span class="tag-badge-text"></span>
+        <button class="tag-remove">&times;</button>
+        <input name="tags" type="hidden" class="tag-badge-input"/>
+    </span>
+</template>
+
+<script th:inline="javascript">
+    const thTags = /*[[${tags}]]*/ "tasks";
+</script>
+
+<script th:src="@{/javascript/browseRenovationsSearch.js}"></script>
+<script th:src="@{/javascript/tooltips.js}"></script>
+<script th:src="@{/javascript/autocompletion.js}"></script>
+<script th:src="@{/javascript/clearInput.js}"></script>
+</body>
+</html>

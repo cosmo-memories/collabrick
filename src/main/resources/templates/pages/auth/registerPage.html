@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--/*/ <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}"></th:block> /*/-->
+    <title>Sign up</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+</head>
+<body style="padding-top:70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 48rem;">
+    <div class="container position-relative">
+        <h3 class="m-0 text-center">Sign up</h3>
+        <form class="renovation-card" method="post" th:action="@{/register}" th:object="${user}">
+            <div class="w-100">
+
+                <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'First Name',
+                            true,
+                            'fname',
+                            'text',
+                            'Enter your first name',
+                            '',
+                            ${errors?.firstNameError},
+                            true
+                        )}"/>
+
+                <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'Last Name',
+                            false,
+                            'lname',
+                            'text',
+                            'Enter your last name',
+                            '',
+                            ${errors?.lastNameError},
+                            true
+                        )}"/>
+
+                <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'Email address',
+                            true,
+                            'email',
+                            'text',
+                            'Enter email',
+                            'We\'ll never share your email with anyone else.',
+                            ${errors?.emailError},
+                            true
+                        )}"/>
+
+                <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'Password',
+                            true,
+                            'password',
+                            'password',
+                            'Enter password',
+                            '',
+                            ${errors?.passwordError},
+                            false
+                        )}"/>
+
+                <th:block th:insert="~{fragments/formInputFragment.html :: formInput(
+                            'Retype password',
+                            true,
+                            'retypePassword',
+                            'password',
+                            'Retype password',
+                            '',
+                            ${errors?.passwordError},
+                            true
+                        )}"/>
+                <th:block th:replace="~{fragments/locationFormFragment :: locationForm()}"/>
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div class="flex-grow-1">
+                        <p class="m-0">
+                            Ready to verify your account? <a th:href="@{/verification}">Verify</a>
+                        </p>
+                        <p class="m-0">
+                            Already have an account? <a th:href="@{/login}">Sign in</a>
+                        </p>
+                    </div>
+                    <div class="d-flex flex-column-reverse flex-md-row gap-2">
+                        <a class="button button-secondary" th:href="@{/}">Cancel</a>
+                        <button class="button button-primary">Sign up</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

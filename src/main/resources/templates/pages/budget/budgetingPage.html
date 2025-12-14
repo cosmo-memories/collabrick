@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Renovation Budget</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}"></th:block>
+    <script lang="javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="padding-top:70px">
+<div>
+    <nav th:replace="~{fragments/navBarFragment :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+    <div>
+        <!-- Page content -->
+        <div class="main container-fluid py-4" style="max-width: 80rem;">
+            <a class="breadcrumbs mb-5" th:href="@{/myRenovations/{id}(id=${renovation.id})}">
+                &larr; Back to Renovation
+            </a>
+            <div class="d-flex justify-content-between align-items-end">
+                <div class="flex-grow-1">
+                    <h1 class="text-break mb-1" style="margin-bottom: 0.5rem;" th:text="${renovation.getName()}"></h1>
+                    <div class="divider" style="margin: 0;"></div>
+                </div>
+                <a class="button button-outline-primary ms-3"
+                   th:href="@{/myRenovations/{id}/editBudget(id=${renovation.id})}">
+                    Edit Budget
+                </a>
+            </div>
+
+            <div class="d-flex justify-content-between gap-2 flex-md-row flex-column">
+                <div class="renovation-card chart-card w-100">
+                    <canvas id="budgetChart" th:if="${budgetSum > 0}"></canvas>
+                    <div th:if="${budgetSum == 0}"
+                         class="d-flex justify-content-center align-items-center text-center flex-grow-1">
+                        <span>Set a budget for this renovation to view your budget breakdown</span>
+                    </div>
+                </div>
+                <div class="renovation-card chart-card w-100">
+                    <canvas id="expenseChart" th:if="${expenseSum > 0}"></canvas>
+                    <div th:if="${expenseSum == 0}"
+                         class="d-flex justify-content-center align-items-center text-center flex-grow-1">
+                        <span>Add your expenses to this renovation to view your spending breakdown</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="renovation-card">
+                <div class="row w-100  gx-0">
+                    <div class="col-md-6 col-sm-12 pe-md-2 pe-sm-0">
+                        <div th:replace="~{fragments/progressBarFragment :: progressBar(title='Miscellaneous', currentValue=${miscExpenses}, max=${miscBudget}, colour='miscellaneous')}"></div>
+                        <div th:replace="~{fragments/progressBarFragment :: progressBar(title='Labour', currentValue=${labourExpenses}, max=${labourBudget}, colour='labour')}"></div>
+                        <div th:replace="~{fragments/progressBarFragment :: progressBar(title='Professional Services', currentValue=${serviceExpenses}, max=${serviceBudget}, colour='professional-services')}"></div>
+                        <div th:replace="~{fragments/progressBarFragment :: progressBar(title='Cleanup', currentValue=${cleanupExpenses}, max=${cleanupBudget}, colour='cleanup')}"></div>
+                    </div>
+
+                    <div class="col-md-6 col-sm-12 ps-md-2 ps-sm-0">
+                        <div th:replace="~{fragments/progressBarFragment :: progressBar(title='Material', currentValue=${materialExpenses}, max=${materialBudget}, colour='material')}"></div>
+                        <div th:replace="~{fragments/progressBarFragment :: progressBar(title='Equipment', currentValue=${equipmentExpenses}, max=${equipmentBudget}, colour='equipment')}"></div>
+                        <div th:replace="~{fragments/progressBarFragment :: progressBar(title='Permit', currentValue=${permitExpenses}, max=${permitBudget}, colour='permit')}"></div>
+                        <div th:replace="~{fragments/progressBarFragment :: progressBar(title='Delivery', currentValue=${deliveryExpenses}, max=${deliveryBudget}, colour= 'delivery')}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="renovation-card flex-column pb-3">
+                <h5>Budget Summary</h5>
+            <div class="row ">
+                <div class="col-md-4 mt-2">
+                        <div class="budget-box total">
+                            <p th:text="'$' + ${budgetSum}"></p>
+                        <h4>Total Budget</h4>
+                        </div>
+                </div>
+                <div class="col-md-4 mt-2">
+                        <div class="budget-box" th:classappend="${budgetSum - expenseSum < 0 ? 'spent-over' : 'spent'}">
+                            <p th:text="'$' + ${expenseSum}"></p>
+                            <h4>Total Expenses</h4>
+                        </div>
+                </div>
+                <div class="col-md-4 mt-2">
+                        <div class="budget-box" th:classappend="${budgetSum - expenseSum < 0 ? 'spent-over' : 'still'}">
+                            <p th:text="${budgetSum - expenseSum < 0} ?
+                                            '$' + (${expenseSum - budgetSum}) :
+                                            '$' + (${budgetSum - expenseSum})"></p>
+                        <h4 th:text="${budgetSum - expenseSum < 0} ? 'Over Budget' : 'Still to Spend'"></h4>
+                        </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script th:inline="javascript">
+    // Expense values
+    let miscExpenses = /*[[${miscExpenses}]]*/ 0;
+    let materialExpenses = /*[[${materialExpenses}]]*/ 0;
+    let labourExpenses = /*[[${labourExpenses}]]*/ 0;
+    let equipmentExpenses = /*[[${equipmentExpenses}]]*/ 0;
+    let serviceExpenses = /*[[${serviceExpenses}]]*/ 0;
+    let permitExpenses = /*[[${permitExpenses}]]*/ 0;
+    let cleanupExpenses = /*[[${cleanupExpenses}]]*/ 0;
+    let deliveryExpenses = /*[[${deliveryExpenses}]]*/ 0;
+
+    // Budget values
+    let miscBudget = /*[[${miscBudget}]]*/ 0;
+    let materialBudget = /*[[${materialBudget}]]*/ 0;
+    let labourBudget = /*[[${labourBudget}]]*/ 0;
+    let equipmentBudget = /*[[${equipmentBudget}]]*/ 0;
+    let serviceBudget = /*[[${serviceBudget}]]*/ 0;
+    let permitBudget = /*[[${permitBudget}]]*/ 0;
+    let cleanupBudget = /*[[${cleanupBudget}]]*/ 0;
+    let deliveryBudget = /*[[${deliveryBudget}]]*/ 0;
+</script>
+<script lang="javascript" th:src="@{/javascript/customPieChart.js}"></script>
+</body>
+</html>

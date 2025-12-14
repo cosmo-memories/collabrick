@@ -1,0 +1,132 @@
+stages:
+  - tagChecking
+  - build
+  - test
+  - sonarqube
+  - deploy
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+tag-checker:
+  stage: tagChecking
+  script:
+    - python3 tag_checker.py $CI_COMMIT_TAG
+  only:
+    - tags
+
+junit:
+  stage: test
+  script:
+    - ./gradlew test
+    - ls ./build/jacoco
+  artifacts:
+    paths:
+      - build/jacoco/test-report.xml
+
+sonarqube-report:
+  stage: sonarqube
+  script:
+    ./gradlew sonarqube
+
+integration-tests:
+  stage: test
+  script:
+    - ./gradlew integration
+  artifacts:
+    paths:
+      - build/jacoco/integration.exec
+      - build/jacoco/integration-report.xml
+
+cucumber-acceptance-tests:
+  stage: test
+  script:
+    - ./gradlew cucumber
+  artifacts:
+    paths:
+      - build/jacoco/cucumber.exec
+      - build/jacoco/cucumber-report.xml
+
+end2end-tests:
+  stage: test
+  script:
+    - ./gradlew end2end
+  artifacts:
+    paths:
+      - build/jacoco/end2end.exec
+      - build/jacoco/end2end-report.xml
+
+generate-test-coverage-reports:
+  stage: test
+  dependencies:
+    - junit
+    - integration-tests
+    - cucumber-acceptance-tests
+    - end2end-tests
+  script:
+    ./gradlew jacocoTestReport
+  artifacts:
+    paths:
+      - build/jacoco/*
+
+# builds all branches, except dev and main
+branch-build:
+  stage: build
+  script:
+    - ./gradlew bootJar
+  artifacts:
+    paths:
+      - build/libs
+  except:
+    - tags
+    - main
+    - dev
+
+deploy-staging:
+  stage: deploy
+  script:
+    - ./gradlew bootJar
+    - rm -rf /home/gitlab-runner/staging/ || true
+    - mkdir /home/gitlab-runner/staging/
+    - cp -r ./build/libs /home/gitlab-runner/staging
+    - cp runner-scripts/staging.sh /home/gitlab-runner/staging.sh
+    - chmod u+x /home/gitlab-runner/staging.sh
+    - echo "export DB_USERNAME=${DB_USERNAME}" > /home/gitlab-runner/staging/.env
+    - echo "export DB_PASSWORD=${DB_PASSWORD}" >> /home/gitlab-runner/staging/.env
+    - echo "export MAIL_USERNAME=${MAIL_USERNAME}" >> /home/gitlab-runner/staging/.env
+    - echo "export MAIL_PASSWORD=${MAIL_PASSWORD}" >> /home/gitlab-runner/staging/.env
+    - echo "export GEMINI_API_KEY=${GEMINI_API_KEY_STAGING}" >> /home/gitlab-runner/staging/.env
+    - echo "export MAPBOX_ACCESS_TOKEN=${MAPBOX_ACCESS_TOKEN}" >> /home/gitlab-runner/staging/.env
+    - sudo systemctl restart staging
+  artifacts:
+    paths:
+      - build/libs
+  only:
+    - dev
+
+deploy-production:
+  stage: deploy
+  script:
+    - ./gradlew bootJar
+    - rm -rf /home/gitlab-runner/production/ || true
+    - mkdir /home/gitlab-runner/production/
+    - cp -r ./build/libs /home/gitlab-runner/production
+    - cp runner-scripts/production.sh /home/gitlab-runner/production.sh
+    - chmod u+x /home/gitlab-runner/production.sh
+    - echo "export DB_USERNAME=${DB_USERNAME}" > /home/gitlab-runner/production/.env
+    - echo "export DB_PASSWORD=${DB_PASSWORD}" >> /home/gitlab-runner/production/.env
+    - echo "export MAIL_USERNAME=${MAIL_USERNAME}" >> /home/gitlab-runner/production/.env
+    - echo "export MAIL_PASSWORD=${MAIL_PASSWORD}" >> /home/gitlab-runner/production/.env
+    - echo "export GEMINI_API_KEY=${GEMINI_API_KEY_PRODUCTION}" >> /home/gitlab-runner/production/.env
+    - echo "export MAPBOX_ACCESS_TOKEN=${MAPBOX_ACCESS_TOKEN}" >> /home/gitlab-runner/production/.env
+    - sudo systemctl restart production
+  artifacts:
+    paths:
+      - build/libs
+  only:
+    - tags

@@ -1,0 +1,18 @@
+<!-- This fragment is modified from a version found on chat gpt -->
+<th:block th:fragment="formInput(label, required, fieldName, type, placeholder, smallMessage, error, showErrorMessage)">
+    <div class="form-group mb-3 mt-3">
+        <label class="form-label" th:for="${fieldName}">
+            <span th:text="${label}">Label</span>
+            <th:block th:if="${required}" th:insert="~{fragments/requiredInputFragment.html :: requiredInput}"/>
+        </label>
+        <input class="form-control"
+               th:classappend="${error} != null ? ' error' : ''"
+               th:field="*{__${fieldName}__}"
+               th:id="${fieldName}"
+               th:placeholder="${placeholder}"
+               th:type="${type}"/>
+        <small class="form-text text-muted" id="help" th:text="${smallMessage}"></small>
+        <th:block th:if="${showErrorMessage}"
+                  th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${error})}"/>
+    </div>
+</th:block>

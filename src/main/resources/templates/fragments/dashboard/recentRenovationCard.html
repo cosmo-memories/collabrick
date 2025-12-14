@@ -1,0 +1,44 @@
+<th:block th:fragment="recentRenovationCard(recentRenovation)">
+  <a class="renovation-card px-4 py-4 d-block text-decoration-none"
+     th:href="@{/renovation/{id}(id=${recentRenovation.getRenovation().getId()})}">
+    <div class="dashboard-recent-reno-content">
+      <div class="dashboard-recent-reno-label">
+        <p class="mb-1" th:text="${recentRenovation.getRenovation().name}"></p>
+        <div class="dashboard-recent-reno-stats-container">
+          <div class="dashboard-recent-reno-stat">
+            <!-- Calendar icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 2v4"/>
+              <path d="M16 2v4"/>
+              <rect width="18" height="18" x="3" y="4" rx="2"/>
+              <path d="M3 10h18"/>
+            </svg>
+            <span th:text="|Opened ${recentRenovation.relativeTime}|"></span>
+          </div>
+
+          <div class="dashboard-recent-reno-stat">
+            <!-- Users icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <path d="M16 3.128a4 4 0 0 1 0 7.744"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+              <circle cx="9" cy="7" r="4"/>
+            </svg>
+            <span th:text="${recentRenovation.getRenovation().getMembers().size()}"></span>
+
+          </div>
+          <div th:if="${user != recentRenovation.getRenovation().getOwner()}" class="dashboard-recent-reno-stat">
+            <span>|</span>
+            <span th:text="|Owned by ${recentRenovation.getRenovation().getOwner().getFname()} ${recentRenovation.getRenovation().getOwner().getLname()}|"></span>
+          </div>
+
+        </div>
+      </div>
+      <div class="button button-outline-primary">View</div>
+    </div>
+  </a>
+</th:block>

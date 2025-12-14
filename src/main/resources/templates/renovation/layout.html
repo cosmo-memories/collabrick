@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <title th:text="${renovation.getName()}"></title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <th:block th:insert="~{fragments/generalHeadersFragment :: headers}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/renovation/sidebar.css}"/>
+    <th:block th:insert="~{'renovation/content/' + ${contentType} :: head}"></th:block>
+</head>
+<body style="padding-top: 70px;">
+
+<!-- Navbar -->
+<nav th:replace="~{fragments/navBarFragment :: navBar(
+    activeLink=${activeLink},
+    extraOffCanvasContent=~{renovation/fragment/renovationSidebarContentFragment :: renovationSidebarContent(renoChannels=${channels})}
+)}"></nav>
+
+
+<!-- Main Layout -->
+<div class="renovation-layout-wrapper">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="breadcrumbs" onclick="goBack()" role="button">
+                &larr; <span id="back-button-label"></span>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+            <th:block
+                    th:replace="~{renovation/fragment/renovationSidebarContentFragment :: renovationSidebarContent(renoChannels=${channels})}"></th:block>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <!-- only allow the chat page to not be scrollable -->
+    <main class="main-content pt-4 pb-4 px-4" th:classappend="${contentType != 'chat' ? 'scrollable' : ''}">
+        <th:block th:switch="${contentType}">
+            <th:block th:case="'overview'" th:insert="~{renovation/content/overview :: content}"></th:block>
+            <th:block th:case="'tasks'" th:insert="~{renovation/content/tasks :: content}"></th:block>
+            <th:block th:case="'calendar'" th:insert="~{renovation/content/calendar :: content}"></th:block>
+            <th:block th:case="'budget'" th:insert="~{renovation/content/budget :: content}"></th:block>
+            <th:block th:case="'expenses'" th:insert="~{renovation/content/expenses :: content}"></th:block>
+            <th:block th:case="'members'" th:insert="~{renovation/content/members :: content}"></th:block>
+            <th:block th:case="'chat'" th:insert="~{renovation/content/chat :: content}"></th:block>
+            <th:block th:case="'task'" th:insert="~{renovation/content/task :: content}"></th:block>
+
+            <th:block th:case="*">
+                <p>Content not found</p>
+            </th:block>
+        </th:block>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    window.isPublic = /*[[${isPublic}]]*/ false;
+    window.isMember = /*[[${isMember}]]*/ false;
+    window.baseUrl = /*[[${baseUrl}]]*/ false;
+    window.fullBaseUrl = /*[[${fullBaseUrl}]]*/ false;
+</script>
+</body>
+
+<script th:inline="javascript">
+    const id = /*[[${renovation.id}]]*/ 0;
+    const isMember = /*[[${isMember}]]*/ false;
+    const channelNamesList = /*[[${channelNames}]]*/ [];
+</script>
+<th:block th:if="${isOwner}">
+    <div th:replace="~{fragments/modals/inviteMemberModal :: inviteMemberModal(renovation=${renovation}, modalId='inviteModal' + ${renovation.id})}"></div>
+    <div th:replace="~{fragments/modals/newChannelModal :: newChannelModal(renovation=${renovation}, modalId='newChannelModal')}"></div>
+    <th:block th:if="${isOwner and contentType == 'chat' and channel != null}">
+        <div th:replace="~{fragments/modals/addChatMembersModal :: addChatMembersModal(modalId='addChatMembersModal')}"></div>
+    </th:block>
+</th:block>
+<th:block th:if="${contentType == 'chat' and channel != null}">
+    <div th:replace="~{fragments/modals/memberListModal :: memberListModal('memberListModal')}"></div>
+</th:block>
+<th:block th:insert="~{'renovation/content/' + ${contentType} :: scripts}"></th:block>
+</html>

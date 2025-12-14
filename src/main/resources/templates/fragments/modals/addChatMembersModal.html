@@ -1,0 +1,62 @@
+<div class="modal fade" th:fragment="addChatMembersModal(modalId)"
+     th:id="${modalId}" tabindex="-1" aria-hidden="true" th:attr="aria-labelledby=${modalId} + 'Label'">
+
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" th:id="${modalId} + 'Label'" th:text="${'Add members to ' + channel.name}">
+        </h5>
+      </div>
+
+      <form th:action="@{'/renovation/' + ${renovation.id} + '/chat/' + ${channel.id} +'/add'}" method="post">
+        <div class="modal-body">
+
+          <div style="max-height: 130px; overflow-y: auto;">
+            <div class="form-check d-flex align-items-center gap-3 py-2 border-bottom ms-2"
+                 th:each="member : ${renovation.getSortedMembers()}"
+                 th:if="${member.role.displayName != 'Owner' && !channel.members.contains(member.user)}"
+                 th:with="user=${member.user}">
+
+              <input class="form-check-input mt-0 user-checkbox"
+                     type="checkbox"
+                     name="userIds"
+                     th:id="${user.id}"
+                     th:value="${user.id}"/>
+
+              <div class="d-flex align-items-center flex-grow-1">
+                <label class="team-member-name" th:for="${inputId}"
+                       th:text="${user.fname + ' ' + user.lname}"></label>
+              </div>
+            </div>
+
+            <div th:if="${renovation.getMembers().size() == channel.members.size()}">
+              <span>No more members left to add</span>
+            </div>
+
+          </div>
+
+          <div id="member-error" class="error-message" style="display: none">
+            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                 stroke-width="2"
+                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" x2="12" y1="8" y2="12"/>
+              <line x1="12" x2="12.01" y1="16" y2="16"/>
+            </svg>
+            <span id="member-error-message"></span>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button class="button button-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button class="button button-secondary disabled-button" th:if='${renovation.getMembers().size() == channel.members.size()}' disabled="">Add</button>
+          <button class="button button-primary" th:unless='${renovation.getMembers().size() == channel.members.size()}' id="addMembersSubmitButton"  type="submit">Add</button>
+
+        </div>
+      </form>
+    </div>
+  </div>
+  <script th:src="@{/javascript/chat/addMemberModal.js}"></script>
+</div>

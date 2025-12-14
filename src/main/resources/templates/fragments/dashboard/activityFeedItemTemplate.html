@@ -1,0 +1,29 @@
+<th:block th:fragment="activityFeedItemTemplate">
+    <template id="activity-feed-item-template">
+        <a class="unstyled-link activity-link">
+            <div class="renovation-card justify-content-start gap-4 dashboard-clickable">
+                <div class="d-flex gap-4">
+                    <div class="activity-icon">
+
+                    </div>
+
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex gap-4">
+                                <div class="d-flex justify-content-start gap-2">
+                                    <!-- sender name -->
+                                    <strong class="activity-sender-name">Hello</strong>
+                                    <!--time stamp-->
+                                    <span class="activity-timestamp"></span>
+                                </div>
+                            </div>
+
+                            <span class="notification-message activity-message">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </template>
+</th:block>

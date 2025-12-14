@@ -1,0 +1,344 @@
+<th:block th:fragment="individualRenovationDetailsFragment(canEdit, isMember)">
+    <div class="d-flex flex-column gap-5 mt-3">
+        <!-- title card -->
+        <div class="renovation-card">
+            <div class="renovation-content">
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-column">
+                        <h1 class="text-break" th:text="${renovation.name}"></h1>
+                        <p th:if="${canEdit or isMember}">
+                            <b>Current total expenditure:</b>
+                            <span th:classappend="${renovation.getBudget().getBudgetSum() - expenseTotal < 0 ? 'over-budget-highlight' : 'expense-highlight'}" id="expenseTotal" th:text="${expenseTotal == 0} ? '$0.00' : '$' + ${expenseTotal}"></span>
+                            NZD across
+                            <span th:classappend="${renovation.getBudget().getBudgetSum() - expenseTotal < 0 ? 'over-budget-highlight' : 'expense-highlight'}" id="expenseItems" th:text="${expenseNumber}"></span>
+                            expense items.
+                        </p>
+                    </div>
+
+                    <div class="d-flex flex-column gap-2">
+                        <!-- if can edit is true, show the make public option -->
+                        <div th:if="${canEdit and !isMember}"
+                             class="checkbox-wrapper form-check form-switch form-check-reverse flex-shrink-0">
+                            <form id="visibilityForm" method="POST"
+                                  th:action="@{/myRenovations/{id}/setVisibility(id=${renovation.id})}">
+                                <input type="hidden" name="isPublic" value="false">
+                            </form>
+                            <input class="form-check-input" type="checkbox" value="" id="publicRenovation"
+                                   th:checked="${renovation.isPublic}">
+                            <label class="form-check-label" for="publicRenovation" style="margin-left: 5px">
+                                Make my renovation public
+                            </label>
+                        </div>
+                        <a class="button button-primary" th:if="${canEdit or isMember}"
+                           th:href="@{/myRenovations/{id}/expenditures(id=${renovation.id})}">
+                            Expenditures
+                        </a>
+                    </div>
+                </div>
+
+                <span class="renovation-location" th:if="${renovation.location.streetAddress != ''}"
+                      th:text="${renovation.location.streetAddress}">Not Found</span>
+                <br th:if="${renovation.location.streetAddress != ''}"/>
+                <span class="renovation-location" th:if="${renovation.location.suburb != ''}"
+                      th:text="${renovation.location.suburb}">Not Found</span>
+                <br th:if="${renovation.location.suburb != ''}"/>
+                <span class="renovation-location" th:if="${renovation.location.postcode != ''}"
+                      th:text="${ renovation.location.city + ' ' + renovation.location.postcode}">Not Found</span>
+                <br th:if="${renovation.location.postcode != ''}"/>
+                <span class="renovation-location" th:if="${renovation.location.country != ''}"
+                      th:text="${renovation.location.country}">Not Found</span>
+                <div style="padding-top: 10px">
+                    <p class="renovation-description" th:text="${renovation.description}"></p>
+                </div>
+
+                <!-- Room display-->
+                <div>
+                    <h6 th:if="${renovation.rooms.size > 0}">Rooms:</h6>
+                </div>
+                <div class="renovation-rooms">
+                    <span class="room-badge" th:each="room : ${renovation.rooms}"><span
+                            th:text="${room.name}">Room Name</span></span>
+                </div>
+                <!-- Tag display-->
+                <div style="margin-top: 5px">
+                    <h6>Tags:</h6>
+                </div>
+
+                <div class="renovation-rooms">
+                    <span class="tag-badge" th:each="tag : ${renovation.tags}">
+                        <span style="display: inline-flex">
+                            <span th:text="'#' + ${tag.tag}">Tag</span>
+                            <form th:if="${canEdit and !isMember}" class="tag-display"
+                                  th:action="@{/myRenovations/{id}/deleteTag/(id=${renovation.id})}"
+                                  method="post">
+                                <input type="hidden" th:value="${tag.tag}" name="tag">
+                                <button class="button tag-remove" id="remove-tag-button" type="submit">
+                                   x
+                                </button>
+                            </form>
+                        </span>
+                    </span>
+                </div>
+                <!-- End tag display -->
+                <!-- Tag input -->
+                <form th:if="${canEdit && renovation.tags.size() < 5 and !isMember}" class="tag-form"
+                      th:action="@{/myRenovations/{id}(id=${renovation.id})}"
+                      method="post">
+                    <div class="row input-row align-items-start">
+                        <div class="col-md-10 mb-1">
+                            <div class="autocomplete" style="width: 100%">
+                                <input id="tagAutocomplete" class="tag-input form-control" autocomplete="off"
+                                       placeholder="Enter New Tag"
+                                       th:value="${tagName}" name="tagName" type="text">
+                                <th:block
+                                        th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${tagError})}"/>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-1 d-grid">
+                            <button class="button button-primary submit-button" id="add-tag-button" type="submit">
+                                Add Tag
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <!-- End tag input -->
+
+                <div class="d-flex flex-column justify-content-start align-items-start gap-2" th:if="${!canEdit or isMember}">
+                    <i class="my-auto renovation-date"
+                       th:text="${'Created on ' + T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(renovation.createdTimestamp)} + ' by '"></i>
+                    <div class="d-flex justify-content-start align-items-center gap-2">
+                        <img th:src="@{/{image}(image=${renovation.owner.image})}"
+                             class="rounded-circle d-inline" height="40" width="40" alt="User Image"/>
+                        <p class="my-auto" th:text="${renovation.owner.fname} + ' ' + ${renovation.owner.lname}"></p>
+                    </div>
+                </div>
+                <!-- Div for date for my own renovations-->
+                <div class="d-flex flex-column justify-content-start align-items-start gap-2" th:if="${canEdit and !isMember}">
+                    <i class="my-auto renovation-date"
+                       th:text="${'Created on ' + T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(renovation.createdTimestamp)}"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab d-flex flex-row justify-content-between align-items-center w-100 mt-4">
+        <div>
+            <button class="tab-links tab-tasks tab-button" onClick="openTab('tasks')" id="defaultOpen">Tasks</button>
+            <button class="tab-links tab-calendar tab-button" onClick="openTab('calendar')">Task Calendar</button>
+            <button class="tab-links tab-members tab-button" onClick="openTab('members')">Members</button>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropdown-toggle w-100 d-flex justify-content-between align-items-center tab-button"
+                    type="button" id="filterStatesBtn"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="me-4">Filter States</span>
+            </button>
+            <form method="get"
+                  th:with="formAction=${canEdit} ? '/myRenovations/' + ${renovation.id} : '/browse/' + ${renovation.id}"
+                  th:action="@{${formAction}}">
+                <ul class="dropdown-menu" aria-labelledby="filterStatesBtn">
+                    <li th:each="state : ${T(nz.ac.canterbury.seng302.homehelper.entity.TaskState).values()}"
+                        class="dropdown-item mb-2">
+                        <label class="form-check d-flex align-items-center gap-2">
+                            <input class="form-check-input task-filter-checkbox"
+                                   type="checkbox"
+                                   th:id="${state.getDisplayName}"
+                                   name="states"
+                                   th:value="${state}">
+                            <span class="badge" th:classappend="${state.getBadgeClassName()}"
+                                  th:text="${state.getDisplayName}"></span>
+                        </label>
+                    </li>
+                    <button class="button button-primary submit-button task-filter-button" type="submit"
+                            id="filterApply" style="margin-inline-start: 9px">Apply Filters
+                    </button>
+                </ul>
+            </form>
+        </div>
+    </div>
+
+    <div id="tasks" class="tab-content">
+        <div class="d-flex align-content-center justify-content-between">
+            <h3 class="m-0">Tasks</h3>
+            <a th:if="${canEdit or isMember}" class="button button-primary"
+               th:href="@{/myRenovations/{id}/newTask(id=${renovation.id})}">
+                Add New Task
+            </a>
+
+        </div>
+        <div class="d-flex flex-column gap-2 mt-3">
+            <div th:replace="~{fragments/renovation/renovationTasksFragment :: tasksContainer(${renovation}, ${pagination}, ${canEdit}, ${isMember})}"></div>
+        </div>
+    </div>
+    <!--https://dev.to/wizdomtek/creating-a-dynamic-calendar-using-html-css-and-javascript-29m  this is where I got the calendar from-->
+    <div id="calendar" class="tab-content">
+
+    </div>
+
+    <div id="members" class="tab-content p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h3 class="m-0">Members</h3>
+            <a th:if="${canEdit and !isMember}" class="button button-primary" data-bs-toggle="modal"
+               th:data-bs-target="'#inviteModal' + ${renovation.id}" type="button">
+                Invite Member
+            </a>
+        </div>
+
+        <div class="row row-cols-1 gy-3">
+            <div th:each="member : ${renovation.getSortedMembers()}"
+                 class="col">
+                <div class="d-flex align-items-center p-3 renovation-card">
+                    <div class="d-flex align-items-center">
+                        <img th:if="${member.user.image != null}"
+                             th:src="@{${'/'} + ${member.user.image}}"
+                             class="rounded-circle me-3 border shadow-sm"
+                             height="50" width="50" alt="User Image">
+
+                        <img th:if="${member.user.image == null}"
+                             th:src="@{/images/PlaceholderIcon.png}"
+                             class="rounded-circle me-3 border shadow-sm"
+                             height="50" width="50" alt="User Image">
+
+                        <div>
+                            <h6 class="mb-0" th:text="${member.user.fname +  ' ' + member.user.lname}"></h6>
+                            <small class="text-muted" th:text="${member.role.displayName}"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:each="invitation : ${renovation.getInvitations()}"
+                class="col" th:if="${invitation.getInvitationStatus().getDisplayName() != 'Accepted'}">
+                <div class="d-flex align-items-center p-3 renovation-card">
+                    <div class="d-flex align-items-center">
+                        <img th:if="${invitation.user != null and invitation.user.image != null}"
+                             th:src="@{${'/'} + ${invitation.user.image}}"
+                             class="rounded-circle me-3 border shadow-sm"
+                             height="50" width="50" alt="User Image">
+
+                        <img th:if="${invitation.user != null and invitation.user.image == null}"
+                             th:src="@{/images/PlaceholderIcon.png}"
+                             class="rounded-circle me-3 border shadow-sm"
+                             height="50" width="50" alt="User Image">
+
+                        <img th:if="${invitation.user == null}"
+                             th:src="@{/images/PlaceholderIcon.png}"
+                             class="rounded-circle me-3 border shadow-sm"
+                             height="50" width="50" alt="User Image">
+
+                        <div>
+                            <h6 class="mb-0" th:text="${invitation.user != null ?
+                        invitation.user.fname + ' ' + invitation.user.lname : invitation.email}"></h6>
+                            <small class="text-muted" th:text="${invitation.getInvitationStatus().getDisplayName()} + ' Invitation'"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div th:if="${canEdit or isMember}" aria-hidden="true" aria-labelledby="taskIconModalLabel" class="modal fade" id="iconModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="taskIconModalLabel">Pick an Icon</h1>
+                    <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <form id="iconForm" method="post" th:action="@{'/myRenovations/' + ${renovation.id} + '/saveIcon'}">
+                    <input id=selectedIcon name="selectedIcon" type="hidden" value="">
+                    <input id="taskId" name="taskId" type="hidden" value="">
+                    <div class="modal-body">
+                        <button class="btn btn-outline-danger" data-icon="house.png" id="resetDefaultIcon"
+                                type="button">
+                            Reset to default
+                        </button>
+                        <div class="outlined-div">
+                            <div id="taskIconDiv"
+                                 style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px">
+                                <button class="task-icon-button" data-icon="house.png" id="defaultButton" type="button">
+                                    <img alt="House Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/house.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="carpentry.png" type="button">
+                                    <img alt="Carpentry Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/carpentry.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="clean_up.png" type="button">
+                                    <img alt="Clean up Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/clean_up.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="demolition.png" type="button">
+                                    <img alt="Demolition Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/demolition.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="door.png" type="button">
+                                    <img alt="Door Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/door.png}"
+                                         width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="electrical.png" type="button">
+                                    <img alt="Electrical Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/electrical.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="finishing_touches.png" type="button">
+                                    <img alt="Finishing touches Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/finishing_touches.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="flooring.png" type="button">
+                                    <img alt="Flooring Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/flooring.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="hvac.png" type="button">
+                                    <img alt="HVAC Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/hvac.png}"
+                                         width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="insulation.png" type="button">
+                                    <img alt="Insulation Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/insulation.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="landscaping.png" type="button">
+                                    <img alt="Landscaping Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/landscaping.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="painting.png" type="button">
+                                    <img alt="Painting Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/painting.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="plumbing.png" type="button">
+                                    <img alt="Plumbing Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/plumbing.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="roofing.png" type="button">
+                                    <img alt="Roofing Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/roofing.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="structural.png" type="button">
+                                    <img alt="Structural Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/structural.png}" width="30">
+                                </button>
+                                <button class="task-icon-button" data-icon="window.png" type="button">
+                                    <img alt="Windows Icon" height="30" style="margin: 5px"
+                                         th:src="@{/images/task_icons/window.png}" width="30">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="button button-primary submit-button" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <th:block th:if="${canEdit}">
+        <div th:replace="~{fragments/modals/deleteRenovationConfirmation :: deleteRenovationConfirmation(renovation=${renovation}, modalId='deleteModal' + ${renovation.id})}"></div>
+        <div th:replace="~{fragments/modals/inviteMemberModal :: inviteMemberModal(renovation=${renovation}, modalId='inviteModal' + ${renovation.id})}"></div>
+        <div th:replace="~{fragments/modals/makeRenovationPublicConfirmation :: makeRenovationPublicConfirmation(renovation=${renovation})}"></div>
+    </th:block>
+</th:block>
+

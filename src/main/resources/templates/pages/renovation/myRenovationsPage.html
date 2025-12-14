@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Renovations</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}">
+    </th:block>
+</head>
+<body style="padding-top:70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 64rem;">
+    <div class="d-flex flex-column flex-md-row align-content-md-center justify-content-between gap-2">
+        <h3 class="m-0">My Renovations</h3>
+
+        <a class="button button-primary" th:href="@{/myRenovations/newRenovation}">Create New Renovation</a>
+    </div>
+    <form class="mt-2" method="get" th:action='@{/myRenovations}' id="filterForm">
+        <select class="ownershipDropdown" name="ownershipFilter" onchange="document.getElementById('filterForm').submit()">
+            <option  value="ALL" th:selected="${ownershipFilter.name() == 'All'}">All</option>
+            <option  value="OWNED_BY_ME" th:selected="${ownershipFilter.name() == 'OWNED_BY_ME'}">Owned by me</option>
+            <option  value="SHARED_WITH_ME" th:selected="${ownershipFilter.name() == 'SHARED_WITH_ME'}">Shared with me</option>
+        </select>
+    </form>
+    <div class="d-flex flex-column gap-2 mt-3 " >
+        <div th:if="${pagination.getItems().isEmpty()}" style="display: flex; justify-content: center; align-items: center; height: 200px;">
+            <p th:if="${ownershipFilter.name() == 'OWNED_BY_ME'}" style="font-size: 20px; text-align: center">You haven’t created any renovation projects yet</p>
+            <p th:if="${ownershipFilter.name() == 'SHARED_WITH_ME'}" style="font-size: 20px; text-align: center">No renovations have been shared with you yet</p>
+            <p th:if="${ownershipFilter.name() == 'ALL'}" style="font-size: 20px; text-align: center">You don’t own or have access to any renovation projects yet</p>
+
+        </div>
+        <div class="d-flex flex-column gap-2">
+            <th:block th:each="renovation : ${pagination.items}" th:insert="~{fragments/renovationFragment :: renovationCard(renovation = ${renovation},
+                                                                                                                        myRenovationsPage = ${true})}"/>
+        </div>
+
+        <div class="mt-4" th:if="${!pagination.getItems().isEmpty()}" th:insert="~{fragments/paginationFragment :: paginationbar(pagination=${pagination})}"></div>
+
+    </div>
+</div>
+<script>
+</script>
+<script th:src="@{/javascript/charCounter.js}"></script>
+</body>
+</html>
+

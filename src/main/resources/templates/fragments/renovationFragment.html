@@ -1,0 +1,58 @@
+<div th:fragment="renovationCard(renovation, myRenovationsPage)" class="renovation-card">
+        <div class="d-flex flex-column gap-2 renovation-content">
+            <h1 class="renovation-title"><span th:text="${renovation.name}">Renovation Name</span></h1>
+            <p class="renovation-description">
+                <span th:text="${renovation.description}">Renovation Description</span>
+            </p>
+
+            <div th:if="${renovation.rooms.size != 0}">
+                <h6>Rooms:</h6>
+                <div class="renovation-rooms">
+                    <span class="room-badge" th:each="room : ${renovation.rooms}">
+                        <span th:text="${room.name}"></span>
+                    </span>
+                </div>
+            </div>
+
+            <div th:if="${renovation.tags.size != 0}">
+                <h6>Tags:</h6>
+                <div class="renovation-rooms">
+                    <span class="tag-badge" th:each="tag : ${renovation.tags}">
+                        <span th:text="'#' + ${tag.tag}">Room Name</span>
+                    </span>
+                </div>
+            </div>
+            <!-- Div for date and user for public renovations-->
+            <div class="d-flex flex-column justify-content-start align-items-start gap-2" th:if="${!myRenovationsPage}">
+                <i class="my-auto renovation-date" th:text="${'Created on ' + T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(renovation.createdTimestamp)} + ' by '"></i>
+                <div class="d-flex justify-content-start align-items-center gap-2">
+                    <img th:src="@{/{image}(image=${renovation.owner.image})}"
+                         class="rounded-circle d-inline" height="40" width="40"  alt="User Image"/>
+                    <p class="my-auto" th:text="${renovation.owner.fname} + ' ' + ${renovation.owner.lname}"></p>
+                </div>
+            </div>
+            <!-- Div for date for my own renovations-->
+            <div class="d-flex flex-column justify-content-start align-items-start gap-2" th:if="${myRenovationsPage}">
+                <i class="my-auto renovation-date" th:text="${'Created on ' + T(nz.ac.canterbury.seng302.homehelper.utility.UserUtil).formatDate(renovation.createdTimestamp)} + ' by '"></i>
+                <div class="d-flex justify-content-start align-items-center gap-2">
+                    <img th:src="@{/{image}(image=${renovation.owner.image})}"
+                         class="rounded-circle d-inline" height="30" width="30"  alt="User Image"/>
+                    <p class="my-auto" th:text="${renovation.owner.fname} + ' ' + ${renovation.owner.lname}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="renovation-actions">
+            <a class="button button-outline-primary flex-grow-1" th:href="@{/renovation/{id}(id=${renovation.id})}">
+                View
+            </a>
+            <button class="button button-outline-danger" data-bs-toggle="modal"
+                    th:data-bs-target="'#deleteModal' + ${renovation.id}"
+                    th:if="${myRenovationsPage and renovation.owner.id == userId}"
+                    type="button">
+                Delete
+            </button>
+        </div>
+    <div th:if="${myRenovationsPage}">
+        <div th:replace="~{fragments/modals/deleteRenovationConfirmation :: deleteRenovationConfirmation(renovation=${renovation}, modalId='deleteModal' + ${renovation.id})}"></div>
+    </div>
+</div>

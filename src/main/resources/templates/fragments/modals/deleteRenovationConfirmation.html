@@ -1,0 +1,34 @@
+<div aria-hidden="true" aria-labelledby="${id}+'Label" class="modal fade" tabindex="-1"
+     th:fragment="deleteRenovationConfirmation(renovation, modalId)" th:id="${modalId}">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renovationFormLongTitle">Delete</h5>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this renovation record?</p>
+            </div>
+            <div class="modal-footer px-0">
+                <button class="button button-secondary" data-bs-dismiss="modal" type="button">
+                    Cancel
+                </button>
+                <form method="POST" th:action="@{/delete}">
+                    <input type="hidden" name="previousUrl" id="previousUrl"/>
+                    <button class="button button-red" name="renovationInstance" style="margin-right: 10px"
+                            th:value="${renovation.id}" type="submit">
+                        Delete
+                    </button>
+                </form>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        const prevUrl = sessionStorage.getItem("previous_url");
+                        if (prevUrl) {
+                            document.getElementById("previousUrl").value = prevUrl;
+                        }
+                    })
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

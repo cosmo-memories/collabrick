@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title class="form-label" th:text="${isNewRenovation ? 'New Renovation' : 'Edit Renovation'}"></title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}"></th:block>
+</head>
+<body style="padding-top:70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 48rem;">
+    <div class="container position-relative">
+        <h3 class="m-0 text-center" th:text="${isNewRenovation ? 'New Renovation' : 'Edit Renovation'}"></h3>
+        <form class="renovation-card"
+              id="renovation-form"
+              method="post"
+              th:with="formAction=${isNewRenovation == true} ? '/myRenovations/newRenovation' : '/myRenovations/' + ${renovation.id} + '/editRenovation'"
+              th:action="@{${formAction}}"
+              th:object="${renovation}">
+            <div class="w-100">
+                <div class="form-group mb-3">
+                    <label class="form-label" for="nameInput">
+                        Name
+                        <th:block th:insert="~{fragments/requiredInputFragment.html :: requiredInput}"/>
+                    </label>
+                    <input autocomplete="off" class="form-control" id="nameInput" name="renovationName"
+                           placeholder="Enter Renovation Name"
+                           th:classappend="${renovationNameError} != null ? ' error' : ''" th:field="*{name}"
+                           type="text">
+                    <th:block
+                            th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${renovationNameError})}"/>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="form-label" for="descriptionInput">
+                        Description
+                    </label>
+                    <div class="char-counter-wrapper">
+                        <textarea class="char-counter form-control" data-char-max="512" id="descriptionInput"
+                                  name="renovationDescription" placeholder="Enter Your Renovations Description" rows="5"
+                                  th:classappend="${renovationDescriptionError} != null ? ' error' : ''"
+                                  th:field="*{description}"></textarea>
+                        <div class="d-flex">
+                            <th:block
+                                    th:insert="~{fragments/errorMessageFragment.html :: errorMessage(${renovationDescriptionError})}"/>
+                            <p class="char-counter-label ms-auto"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="form-label" for="room-name-input">Rooms</label>
+                    <div class="row input-row">
+                        <div class="col-md-8 mb-3">
+                            <input class="form-control" id="room-name-input" name="roomName[]"
+                                   placeholder="Enter a Room Name"
+                                   type="text">
+                            <input class="room-input-id" name="roomIds[]" type="hidden" value="-1">
+                        </div>
+                        <div class="col-md-4 mb-3 d-grid">
+                            <button class="button button-green" id="add-room-button" type="button">Add Room</button>
+                        </div>
+                    </div>
+                    <span class="error-message" id="room-error-message-label" style="display: none;">
+                            <svg fill="none" stroke="currentColor" stroke-linecap="round"
+                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" x2="12" y1="8" y2="12"/>
+                                <line x1="12" x2="12.01" y1="16" y2="16"/>
+                            </svg>
+                            <span id="room-error-text"></span>
+                        </span>
+
+                    <div id="added-rooms-container">
+
+                    </div>
+                </div>
+                <!-- Location form-->
+                <th:block th:replace="~{fragments/locationFormFragment :: locationForm()}"/>
+                <div class="d-flex flex-column-reverse flex-md-row justify-content-end align-items-md-center gap-2">
+                    <button th:if="${isNewRenovation}" type="button" class="button button-secondary"  onclick="goBack()">Cancel</button>
+                    <a th:if="${!isNewRenovation && redirectedUrl != null}" class="button button-secondary" th:href="${redirectedUrl}">Cancel</a>
+                    <a th:if="${!isNewRenovation && redirectedUrl == null}" class="button button-secondary" th:href="@{/renovation/{id}(id=${renovation.id})}">Cancel</a>
+                    <input type="hidden" th:if="${!isNewRenovation}" name="redirectedUrl" th:value="${redirectedUrl}" />
+                    <button class="button button-primary submit-button" id="submitButton"
+                            th:text="${isNewRenovation ? 'Create' : 'Submit'}"
+                            type="submit"></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:insert="~{fragments/renovation/addedRenovationRoomFragment :: addedRoomTemplate}"></th:block>
+<div th:replace="~{fragments/renovation/submitRenovationConfirmation :: submitRenovationConfirmation}"></div>
+
+<script th:inline="javascript">
+    const roomNames = /*[[${roomNames}]]*/ [];
+    const roomIds = /*[[${roomIds}]]*/ [];
+</script>
+
+<script th:src="@{/javascript/charCounter.js}"></script>
+<script th:src="@{/javascript/addRoom.js}"></script>
+</body>
+</html>

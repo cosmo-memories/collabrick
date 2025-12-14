@@ -1,0 +1,25 @@
+<div aria-hidden="true" th:attr="aria-labelledby=${modalId} + 'Label'"
+     class="modal fade" tabindex="-1"
+     th:fragment="taskInfoModalFragment(task, modalId)" th:id="${modalId}" xmlns="http://www.w3.org/1999/html">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"  >
+                <img  th:src="@{'/images/task_icons/' + ${task.iconFileName}}"
+                      style="width: 30px; height: 30px; margin-right: 15px; margin-left: 3px; filter: invert(1);">
+                <h4 id="taskHeader" th:text="${task.getName()}"></h4>
+            </div>
+            <div class="modal-body">
+                <span id="taskDescription" th:text="${task.getDescription()}"></span>
+                <div class="pt-2">
+                     <span class="calendar-room-badge" th:each="room : ${task.getRooms()}"><span
+                             th:text="${room.name}">Room Name</span></span>
+                </div>
+
+            </div>
+            <div class="modal-footer  d-flex justify-content-between px-3">
+                <span  id="taskDate" th:text="'Due ' + ${task.dueDate.getDayOfMonth()} + '/' + ${task.dueDate.getMonthValue()} + '/' + ${task.dueDate.getYear()}"></span>
+                <button class="button button-secondary"  data-bs-dismiss="modal" type="button">Dismiss</button>
+            </div>
+        </div>
+    </div>
+</div>

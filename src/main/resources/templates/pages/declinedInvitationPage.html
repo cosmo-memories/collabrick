@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Invitation Declined</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon" />
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}"/>
+</head>
+<body style="padding-top: 70px;">
+<nav th:replace="~{fragments/navBarFragment :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+<div style="display:flex; align-items:center; justify-content:center; height:75vh" >
+<div class="renovation-card flex-column w-50">
+    <section class="d-flex flex-column justify-content-center">
+        <h1 class="invite-declined-title text-center">Invitation Declined</h1>
+        <p class="fs-4 text-center">
+            You have declined the invitation to join
+            "<strong th:text="${renovationName}">Renovation Project</strong>".
+        </p>
+    </section>
+        <section class="invite-details d-flex justify-content-center flex-column align-items-center">
+            <h2>Invitation Details</h2>
+        <div class="g-3">
+            <p><strong>To:</strong> <span th:text="${invitee}">Invitee Name</span></p>
+            <p><strong>From:</strong> <span th:text="${renovationOwner}">Owner Name</span></p>
+            <p><strong>Project:</strong> <span th:text="${renovationName}">Renovation Name</span></p>
+        </div>
+            <a class="button button-primary" th:href="@{/home}" style="margin-top: 1rem;">Go Back Home</a>
+    </section>
+
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Add Task Expenses</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}">
+    </th:block>
+</head>
+<body style="padding-top:70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 48rem;">
+    <div class="container position-relative">
+        <h3 class="m-0 text-center">Add Expenses</h3>
+        <div class="renovation-card">
+            <div class="w-100">
+                <div class="form-group mb-3 mt-3">
+                    <label class="form-label">
+                        <span>Name</span>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input class="form-control" id="expenseName"
+                           type="text"
+                           placeholder="Expense Name" />
+                </div>
+
+                <div class="form-group mb-3 mt-3">
+                    <label class="form-label">
+                        <span>Price</span>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input class="form-control"
+                           id="expensePrice"
+                           type="text"
+                           placeholder="Expense Price" />
+                </div>
+
+
+                <div class="d-flex flex-column flex-md-row gap-3 mb-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Category</label>
+                        <div class="dropdown">
+                            <button id="expenseCategoryDropdown"
+                                    class="form-control btn-white border dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <span id="expenseCategorySpan" class="expense-category-badge miscellaneous">Miscellaneous</span>
+                            </button>
+                            <input type="hidden" name="state" id="stateInput" value="MISCELLANEOUS">
+                            <ul class="dropdown-menu w-100">
+                                <li th:each="category : ${T(nz.ac.canterbury.seng302.homehelper.model.renovation.ExpenseCategory).values()}">
+                                    <button
+                                            class="dropdown-item d-flex justify-content-between align-items-center px-3 py-1"
+                                            type="button"
+                                            th:data-value="${category.getDisplayName()}"
+                                            onclick="selectCategory(this)">
+                                            <span class="expense-category-badge"
+                                                  th:classappend="${category.displayName.replaceAll(' ', '-').toLowerCase()}"
+                                                  th:text="${category.getDisplayName()}"></span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label text-decoration-none" for="dateInput">Select Date</label>
+                        <input class="form-control py-3" id="dateInput" name="taskDueDate" type="date">
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-md-row justify-content-end align-items-md-center mt-3">
+                    <button class="button button-primary" onclick="onAddClicked()">Add</button>
+                </div>
+            </div>
+        </div>
+        <div id="created-expenses"></div>
+        <div class="mt-3">
+            <div class="d-flex flex-column-reverse flex-md-row justify-content-end align-items-md-center gap-2">
+                <a class="button button-secondary" th:href="@{/renovation/{id}/tasks/{taskId}(id=${renovation.id}, taskId=${task.id})}">Cancel</a>
+                <button class="button button-primary" onclick="onAddToTaskClicked()">Add to Task</button>
+            </div>
+            <div class="d-flex justify-content-end">
+                <div id="add-expense-error" class="text-danger mt-2" style="min-height: 1.25em;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="app-data" th:data-base-url="@{/}" style="display:none"></div>
+<script th:inline="javascript">
+    const renoId = /*[[${renovation.id}]]*/ [];
+    const taskId = /*[[${task.id}]]*/ [];
+</script>
+<script th:src="@{/javascript/addTaskExpenses.js}"></script>
+</body>
+</html>

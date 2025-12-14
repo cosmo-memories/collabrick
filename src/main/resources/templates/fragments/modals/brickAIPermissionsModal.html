@@ -1,0 +1,30 @@
+<div aria-hidden="true" aria-labelledby="${id}+'Label" class="modal fade" tabindex="-1"
+     th:fragment="allowBrickAIConfirmation(renovation)" id="allowBrickAIModal">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 th:if="${!renovation.allowBrickAI}" class="modal-title">Allow brickAI</h5>
+                <h5 th:if="${renovation.allowBrickAI}" class="modal-title">Block brickAI</h5>
+            </div>
+            <div class="modal-body justify-content-center">
+                <p th:if="${renovation.allowBrickAI}">
+                    Are you sure you want to block BrickAI from accessing renovation details for <b>'[[${renovation.name}]]'</b>?
+                </p>
+                <small th:if="${renovation.allowBrickAI}">
+                    All members will lose their personal chat history with brickAI
+                </small>
+                <p th:if="${!renovation.allowBrickAI}">
+                    Are you sure you want to allow BrickAI to access renovation details for <b>'[[${renovation.name}]]'</b>?</p>
+            </div>
+            <div class="modal-footer px-0">
+                <button class="button button-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                <form method="POST" th:action="@{/renovation/{id}/allowBrickAI(id=${renovation.id})}">
+                    <button class="button button-primary submit-button" name="isPublic" style="margin-right: 10px"
+                            value="true" type="submit">
+                        Confirm
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

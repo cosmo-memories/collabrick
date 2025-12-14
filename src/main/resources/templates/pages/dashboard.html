@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+    <link rel="icon" th:src="@{/images/newlogo.svg}" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}"/>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+    <th:block th:insert="~{fragments/generalHeadersFragment.html :: headers}">
+    </th:block>
+</head>
+<body style="padding-top:70px">
+<nav th:replace="~{fragments/navBarFragment.html :: navBar(activeLink=${activeLink}, extraOffCanvasContent=${null})}"></nav>
+
+<div class="mx-auto container-fluid px-6 py-4" style="max-width: 64rem;">
+    <div class="d-flex flex-column gap-4">
+        <div>
+            <h3 class="m-0">Dashboard</h3>
+            <p>Welcome back! Here's what's happening with your renovations.</p>
+
+            <div class="dashboard-stat-cards-container">
+                <div class="renovation-card">
+                    <div class="stat-content">
+                        <div class="stat-text">
+                            <p class="stat-label">Projects</p>
+                            <p class="stat-value"><span th:text="${renoSum}"></span></p>
+                        </div>
+                        <div class="stat-icon color-primary">
+                            <!-- https://lucide.dev/icons/trending-up -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path d="M16 7h5v6"/>
+                                <path d="m22 7-8.5 8.5-5-5L2 17"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="renovation-card">
+                    <div class="stat-content">
+                        <div class="stat-text">
+                            <p class="stat-label">Tasks Due Soon</p>
+                            <p class="stat-value" ><span th:text="${tasks.size()}"></span></p>
+                        </div>
+                        <div class="stat-icon text-danger">
+                            <!-- https://lucide.dev/icons/calendar -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path d="M8 2v4"/>
+                                <path d="M16 2v4"/>
+                                <rect width="18" height="18" x="3" y="4" rx="2"/>
+                                <path d="M3 10h18"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="renovation-card">
+                    <div class="stat-content">
+                        <div class="stat-text">
+                            <p class="stat-label">Completed Tasks</p>
+                            <p class="stat-value"><span th:text="${completeTasks}"></span></p>
+                        </div>
+                        <div class="stat-icon text-success">
+                            <!-- https://lucide.dev/icons/circle-check -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="m9 12 2 2 4-4"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="renovation-card flex-column gap-2">
+            <h6 class="m-0">Recently Accessed Renovations</h6>
+             <th:block th:if="${recentlyAccessedRenovations.size() == 0}">
+                    <p class="text-muted">You have no recently accessed renovations.</p>
+                </th:block>
+
+                <th:block th:each="recentRenovation : ${recentlyAccessedRenovations}">
+                    <div th:replace="fragments/dashboard/recentRenovationCard :: recentRenovationCard(recentRenovation = ${recentRenovation})"></div>
+                </th:block>
+        </div>
+
+        <div class="gap-4 upcoming-tasks-activity-feed-wrapper">
+            <div class="renovation-card flex-column gap-2 upcoming-tasks-container">
+                <h5 class="m-0">Upcoming Tasks</h5>
+                <th:block th:insert="~{fragments/dashboard/upcomingTasksFragment.html :: upcomingTasksFragment(tasks=${tasks})}"></th:block>
+            </div>
+            <div class="renovation-card flex-column gap-2 justify-content-start" id="activity-feed-container">
+                <h5 class="m-0">Activity Feed</h5>
+                <div class="d-flex flex-column gap-2 justify-content-start scrolling-box flex-grow-1" id="activity-feed-items-container">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script th:inline="javascript">
+        const activityItems = /*[[${activity}]]*/ [];
+    </script>
+    <script type="module" th:src="@{/javascript/live_activity/liveActivityUI.js}"></script>
+    <div th:replace="~{fragments/dashboard/activityFeedItemTemplate.html :: activityFeedItemTemplate}"></div>
+    <script type="module" th:src="@{/javascript/live_activity/liveActivityHandler.js}"></script>
+</div>
+</body>
+</html>
